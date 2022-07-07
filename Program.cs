@@ -65,13 +65,6 @@ public class Program {
 		return t;
 	}
 
-	private static int Evaluate(Token tree) {
-		if (tree == null)
-			throw new InvalidExpressionException();
-
-		return tree.Evaluate();
-	}
-	
 	public static void Main(string[] args) {
 		bindings.Add("+", typeof(PlusBinaryOperator));
 		bindings.Add("-", typeof(MinusBinaryOperator));
@@ -86,7 +79,7 @@ public class Program {
 			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|-?\\d+|[\\^*/+-=])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 			Token tree = Parse(lexedLine, 0, 0);
 		//	Console.WriteLine(tree.ToString(0));
-			Console.WriteLine(Evaluate(tree));
+			Console.WriteLine(tree.Evaluate());
 		}
 	}
 }
