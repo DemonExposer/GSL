@@ -10,15 +10,19 @@ using System.Text.RegularExpressions;
 public class Program {
 	private static IDictionary<string, Type> bindings = new Dictionary<string, Type>();
 	private static IDictionary<string, object> vars = new Dictionary<string, object>();
-
+	private static IDictionary<string, int> priorities = new Dictionary<string, int>();
+	
 	private static Token Parse(CheckedString[] line, int i, int depth) {
 		Token t;
 		Type tokenType;
+		// Check if string is a keyword/operator
 		if (bindings.TryGetValue(line[i].Str, out tokenType)) {
-			t = (Token) Activator.CreateInstance(tokenType);
+			t = (Token) Activator.CreateInstance(tokenType); // Instantiate the corresponding class
 			
+			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 			if (t is ArithmeticOperator) {
 				((ArithmeticOperator) t).Left = Parse(line, i + 1, depth+1);
+				// In prefix, the right element is the first one from the left which has not been parsed by some sub-operator yet
 				for (int j = i + 1; j < line.Length; j++) {
 					if (!line[j].IsDone) {
 						((ArithmeticOperator) t).Right = Parse(line, j, depth+1);
@@ -50,6 +54,7 @@ public class Program {
 
 		line[i].IsDone = true;
 
+		// TODO: reduce complexity from n^2 to n, by using priorities
 		if (depth == 0) {
 			for (int j = 0; j < line.Length; j++) {
 				if (!line[j].IsDone) {
@@ -73,6 +78,16 @@ public class Program {
 		bindings.Add("^", typeof(PowerBinaryOperator));
 		bindings.Add("decl", typeof(DeclarationOperator));
 		bindings.Add("=", typeof(AssignmentOperator));
+
+		// Low number for priority means a higher priority
+		priorities.Add("(", 0);
+		priorities.Add("^", 1);
+		priorities.Add("*", 2);
+		priorities.Add("/", 2);
+		priorities.Add("+", 3);
+		priorities.Add("-", 3);
+		priorities.Add("decl", 4);
+		priorities.Add("=", 5);
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
