@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/kelvin/RiderProjects/Interpreter/Interpreter.csproj": {}
+    "/home/kelvin/RiderProjects/GSL/Interpreter.csproj": {}
   },
   "projects": {
-    "/home/kelvin/RiderProjects/Interpreter/Interpreter.csproj": {
+    "/home/kelvin/RiderProjects/GSL/Interpreter.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/kelvin/RiderProjects/Interpreter/Interpreter.csproj",
+        "projectUniqueName": "/home/kelvin/RiderProjects/GSL/Interpreter.csproj",
         "projectName": "Interpreter",
-        "projectPath": "/home/kelvin/RiderProjects/Interpreter/Interpreter.csproj",
+        "projectPath": "/home/kelvin/RiderProjects/GSL/Interpreter.csproj",
         "packagesPath": "/home/kelvin/.nuget/packages/",
-        "outputPath": "/home/kelvin/RiderProjects/Interpreter/obj/",
+        "outputPath": "/home/kelvin/RiderProjects/GSL/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/kelvin/.nuget/NuGet/NuGet.Config"
