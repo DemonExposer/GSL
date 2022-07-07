@@ -1,0 +1,5 @@
+decl x = 5
+
+on (x == 5) {
+	print("hello")
+}
