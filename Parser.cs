@@ -99,7 +99,6 @@ public class Parser {
 			Console.ResetColor();
 		}
 		
-				
 		// Parse the data in the brackets, where index is the index of the head of the tree in line, so index-i
 		// (i being the starting point of subLine in line) will be the index in subLine plus one
 		return Parse(subLine, index - startIndex, depth + 1);
