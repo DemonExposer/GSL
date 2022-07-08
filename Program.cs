@@ -21,14 +21,17 @@ public class Program {
 			
 			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 			if (t is ArithmeticOperator) {
-				((ArithmeticOperator) t).Left = Parse(line, i + 1, depth+1);
-				// In prefix, the right element is the first one from the left which has not been parsed by some sub-operator yet
-				for (int j = i + 1; j < line.Length; j++) {
-					if (!line[j].IsDone) {
-						((ArithmeticOperator) t).Right = Parse(line, j, depth+1);
-						break;
-					}
-				}
+				line[i].IsDone = true;
+				
+				if (i - 2 < 0 || line[i-2].IsDone)
+					((ArithmeticOperator) t).Left = Parse(line, i - 1, depth+1);
+				else
+					((ArithmeticOperator) t).Left = Parse(line, i - 2, depth+1);
+				
+				if (i + 2 >= line.Length || line[i+2].IsDone)
+					((ArithmeticOperator) t).Right = Parse(line, i + 1, depth+1);
+				else
+					((ArithmeticOperator) t).Right = Parse(line, i + 2, depth+1);
 			} else if (t is DeclarationOperator) {
 				((DeclarationOperator) t).SetVars(vars);
 				((DeclarationOperator) t).Left = Parse(line, i + 1, depth+1);
@@ -99,22 +102,37 @@ public class Program {
 		priorities.Add("/", 2);
 		priorities.Add("+", 3);
 		priorities.Add("-", 3);
-		priorities.Add("decl", 4);
-		priorities.Add("=", 5);
+		priorities.Add("=", 4);
+		priorities.Add("decl", 5);
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
 			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|-?\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
-			foreach (CheckedString cs in lexedLine)
-				Console.Write("{0}, ", cs.Str);
-			Console.WriteLine();
+		//	foreach (CheckedString cs in lexedLine)
+		//		Console.Write("{0}, ", cs.Str);
+		//	Console.WriteLine();
 			lexedLine = CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
+
+			int highestPriorityNum = -1;
+			int index = -1;
+			for (int j = 0; j < lexedLine.Length; j++) {
+				int priority;
+				if (priorities.TryGetValue(lexedLine[j].Str, out priority)) {
+					if (priority >= highestPriorityNum) {
+						highestPriorityNum = priority;
+						index = j;
+					}
+				}
+			}
+
+			if (index == -1)
+				throw new FormatException("Line " + (i + 1) + " contains no expression");
 			
-			Token tree = Parse(lexedLine, 0, 0);
+			Token tree = Parse(lexedLine, index, 0);
 		//	Console.WriteLine(tree.ToString(0));
-		//	Console.WriteLine(tree.Evaluate());
+			Console.WriteLine(tree.Evaluate());
 		}
 	}
 }
