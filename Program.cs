@@ -75,6 +75,14 @@ public class Program {
 		return t;
 	}
 
+	private static CheckedString[] CheckComment(CheckedString[] line) {
+		for (int i = 0; i < line.Length; i++)
+			if (line[i].Str == "#")
+				return line.Take(i).ToArray();
+
+		return line;
+	}
+
 	public static void Main(string[] args) {
 		bindings.Add("+", typeof(PlusBinaryOperator));
 		bindings.Add("-", typeof(MinusBinaryOperator));
@@ -96,10 +104,14 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|-?\\d+|[\\^*/+-=()])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|-?\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 			foreach (CheckedString cs in lexedLine)
 				Console.Write("{0}, ", cs.Str);
 			Console.WriteLine();
+			lexedLine = CheckComment(lexedLine);
+			if (lexedLine.Length == 0)
+				continue;
+			
 			Token tree = Parse(lexedLine, 0, 0);
 		//	Console.WriteLine(tree.ToString(0));
 		//	Console.WriteLine(tree.Evaluate());
