@@ -76,7 +76,7 @@ public class Program {
 				throw new FormatException("Line " + (i + 1) + " contains no expression");
 			
 			Token tree = Parser.Parse(lexedLine, index, 0);
-		//	Console.WriteLine(tree.ToString(0));
+			Console.WriteLine(tree.ToString(0));
 			Console.WriteLine(tree.Evaluate());
 		}
 	}
