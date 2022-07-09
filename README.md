@@ -1,5 +1,5 @@
 # GSL
-<img src="img/logo.png" width=200 style="float: right;">
+<img src="img/logo.png" width=200 align="right" />
 This repository contains the official interpreter for GSL (General Scripting Language).<br/>
 
 ### Simplicity with understanding
