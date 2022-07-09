@@ -52,27 +52,28 @@ public class Program {
 			if (lexedLine.Length == 0)
 				continue;
 
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+
 			Console.Write("[");
-			foreach (Token t in Tokenizer.Tokenize(lexedLine))
+			foreach (Token t in tokenizedLine)
 				Console.Write("{0}, ", t.GetType());
 			Console.WriteLine("]");
 			
-			return;
 			int highestPriorityNum = -1;
 			int index = -1;
 			for (int j = 0; j < lexedLine.Length; j++) {
 				int priority;
-				if (lexedLine[j].Str == "(") {
+				if (tokenizedLine[j].Str == "(") {
 					int numBrackets = 1;
 					while (numBrackets > 0) {
 						j++;
-						if (lexedLine[j].Str == "(")
+						if (tokenizedLine[j].Str == "(")
 							numBrackets++;
-						else if (lexedLine[j].Str == ")")
+						else if (tokenizedLine[j].Str == ")")
 							numBrackets--;
 					}
 				}
-				if (priorities.TryGetValue(lexedLine[j].Str, out priority)) {
+				if (tokenizedLine[j] is BinaryOperator && priorities.TryGetValue(tokenizedLine[j].Str, out priority)) {
 					if (priority >= highestPriorityNum) {
 						highestPriorityNum = priority;
 						index = j;
@@ -83,9 +84,9 @@ public class Program {
 			if (index == -1)
 				throw new FormatException("Line " + (i + 1) + " contains no expression");
 			
-			Token tree = Parser.Parse(lexedLine, index, 0);
+			Token tree = Parser.Parse(tokenizedLine, index, 0);
 			Console.WriteLine(tree.ToString(0));
-			Console.WriteLine(tree.Evaluate());
+		//	Console.WriteLine(tree.Evaluate());
 		}
 	}
 }

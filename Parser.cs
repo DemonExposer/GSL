@@ -9,7 +9,7 @@ using Interpreter.Tokens.Operators.Binary.Arithmetic;
 namespace Interpreter; 
 
 public class Parser {
-	private static Token ArithmeticParse(CheckedString[] line, int i, int depth, bool isRightBound) {
+	private static Token ArithmeticParse(Token[] line, int i, int depth, bool isRightBound) {
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
 			// j will be the index of the operator on the other side of the brackets
 			int numBrackets = 1;
@@ -42,11 +42,11 @@ public class Parser {
 		return Parse(line, i + (isRightBound ? 2 : -2), depth + 1);
 	}
 
-	private static Token ParenthesesParse(CheckedString[] line, int i, int depth, bool isRightBound) {
+	private static Token ParenthesesParse(Token[] line, int i, int depth, bool isRightBound) {
 		int startIndex = -1;
 		int highestPriorityNum = -1;
 		int index = -1;
-		CheckedString[] subLine = {};
+		Token[] subLine = {};
 		int numBrackets = 1;
 		for (int j = i + (isRightBound ? 1 : -1); numBrackets > 0; j += isRightBound ? 1 : -1) {
 			// Go until paired bracket is found
@@ -109,50 +109,31 @@ public class Parser {
 		return Parse(subLine, index - startIndex, depth + 1);
 	}
 	
-	public static Token Parse(CheckedString[] line, int i, int depth) {
-		Token t;
+	public static Token Parse(Token[] line, int i, int depth) {
+		Token t = line[i];
 		Type tokenType;
 
 		if (line[i].Str == "-") {
 			if (i == 0 || Program.bindings.ContainsKey(line[i - 1].Str))
 				return Parse(line, i - 1, depth + 1);
 		}
-		
-		if (Program.bindings.TryGetValue(line[i].Str, out tokenType)) { // Check if string is a keyword/operator
-			t = (Token) Activator.CreateInstance(tokenType); // Instantiate the corresponding class
 
-			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
-			if (t is ArithmeticOperator) {
-				line[i].IsDone = true;
-
-				((ArithmeticOperator) t).Left = ArithmeticParse(line, i, depth, false);
-				((ArithmeticOperator) t).Right = ArithmeticParse(line, i, depth, true);
-			} else if (t is DeclarationOperator) {
-				((DeclarationOperator) t).SetVars(Program.vars);
-				((DeclarationOperator) t).Left = Parse(line, i + 1, depth+1);
-				((DeclarationOperator) t).Right = Parse(line, i + 3, depth+1); // Skip =
-			} else if (t is AssignmentOperator) {
-				((AssignmentOperator) t).SetVars(Program.vars);
-				((AssignmentOperator) t).Left = Parse(line, i - 1, depth+1);
-				((AssignmentOperator) t).Right = Parse(line, i + 1, depth+1);
-			} else if (t is ParenthesesOperator) {
-				((ParenthesesOperator) t).Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
-			}
-		} else if (Regex.Matches(line[i].Str, "^[a-zA-Z]\\w*$").Count == 1) {
-			VariableToken vt = new VariableToken(Program.vars);
-			vt.Name = line[i].Str;
-			t = vt;
-
-			if (i < line.Length-1 && line[i + 1].Str == "(") {
-				line[i + 1].IsDone = true;
-				// TODO: parse everything in the function call, and mark the second bracket as done
-			}
-		} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {
-			NumberToken nt = new NumberToken();
-			nt.Num = Int32.Parse(line[i].Str);
-			t = nt;
-		} else {
-			throw new InvalidExpressionException("Line " + line[i].Line + ": " + line[i].Str + " is not a valid expression");
+		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
+		if (t is ArithmeticOperator) {
+			line[i].IsDone = true;
+			
+			((ArithmeticOperator) t).Left = ArithmeticParse(line, i, depth, false);
+			((ArithmeticOperator) t).Right = ArithmeticParse(line, i, depth, true);
+		} else if (t is DeclarationOperator) {
+			((DeclarationOperator) t).SetVars(Program.vars);
+			((DeclarationOperator) t).Left = Parse(line, i + 1, depth+1);
+			((DeclarationOperator) t).Right = Parse(line, i + 3, depth+1); // Skip =
+		} else if (t is AssignmentOperator) {
+			((AssignmentOperator) t).SetVars(Program.vars);
+			((AssignmentOperator) t).Left = Parse(line, i - 1, depth+1);
+			((AssignmentOperator) t).Right = Parse(line, i + 1, depth+1);
+		} else if (t is ParenthesesOperator) {
+			((ParenthesesOperator) t).Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		}
 
 		t.Line = line[i].Line;

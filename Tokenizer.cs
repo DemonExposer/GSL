@@ -14,6 +14,7 @@ public class Tokenizer {
 			if (line[i].Str == "-") { // Minus is unary when it is the first token or if the previous token is an operator
 				if (i == 0 || Program.bindings.ContainsKey(line[i - 1].Str)) {
 					res[i] = new MinusUnaryOperator();
+					res[i].Str = line[i].Str;
 					continue;
 				}
 			}
@@ -37,6 +38,9 @@ public class Tokenizer {
 			} else {
 				throw new InvalidExpressionException("Line " + line[i].Line + ": " + line[i].Str + " is not a valid expression");
 			}
+			
+			
+			res[i].Str = line[i].Str;
 		}
 
 		return res;
