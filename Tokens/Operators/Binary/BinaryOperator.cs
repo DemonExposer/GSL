@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Interpreter.Tokens.Operators; 
+namespace Interpreter.Tokens.Operators.Binary; 
 
 public abstract class BinaryOperator : Token {
 	public string Symbol;

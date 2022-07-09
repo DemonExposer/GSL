@@ -1,4 +1,4 @@
-namespace Interpreter.Tokens.Operators; 
+namespace Interpreter.Tokens.Operators.Binary; 
 
 public class AssignmentOperator : BinaryOperator {
 	private IDictionary<string, object> vars;

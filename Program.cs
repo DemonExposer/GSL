@@ -1,6 +1,8 @@
-﻿using Interpreter.Tokens;
+﻿using DefaultNamespace;
+using Interpreter.Tokens;
 using Interpreter.Tokens.Operators;
-using Interpreter.Tokens.Operators.Arithmetic;
+using Interpreter.Tokens.Operators.Binary;
+using Interpreter.Tokens.Operators.Binary.Arithmetic;
 
 namespace Interpreter;
 
@@ -42,7 +44,7 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|-?\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
@@ -50,6 +52,12 @@ public class Program {
 			if (lexedLine.Length == 0)
 				continue;
 
+			Console.Write("[");
+			foreach (Token t in Tokenizer.Tokenize(lexedLine))
+				Console.Write("{0}, ", t.GetType());
+			Console.WriteLine("]");
+			
+			return;
 			int highestPriorityNum = -1;
 			int index = -1;
 			for (int j = 0; j < lexedLine.Length; j++) {

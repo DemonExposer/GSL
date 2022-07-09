@@ -1,8 +1,10 @@
+using System.ComponentModel.Design;
 using System.Data;
 using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators;
-using Interpreter.Tokens.Operators.Arithmetic;
+using Interpreter.Tokens.Operators.Binary;
+using Interpreter.Tokens.Operators.Binary.Arithmetic;
 
 namespace Interpreter; 
 
@@ -47,6 +49,7 @@ public class Parser {
 		CheckedString[] subLine = {};
 		int numBrackets = 1;
 		for (int j = i + (isRightBound ? 1 : -1); numBrackets > 0; j += isRightBound ? 1 : -1) {
+			// Go until paired bracket is found
 			if (line[j].Str == ")")
 				numBrackets += isRightBound ? -1 : 1;
 			else if (line[j].Str == "(")
@@ -55,6 +58,7 @@ public class Parser {
 			if (numBrackets == 0)
 				break;
 
+			// If there is a nested set of brackets, add that entire set immediately, because otherwise something goes wrong
 			if (isRightBound ? line[j].Str == "(" : line[j].Str == ")") {
 				while (numBrackets > 1) {
 					if (isRightBound && subLine.Length == 0)
@@ -77,6 +81,7 @@ public class Parser {
 				subLine = subLine.Prepend(line[j]).ToArray();
 			}
 
+			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
 			int priority;
 			if (Program.priorities.TryGetValue(line[j].Str, out priority)) {
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
@@ -107,10 +112,15 @@ public class Parser {
 	public static Token Parse(CheckedString[] line, int i, int depth) {
 		Token t;
 		Type tokenType;
-		// Check if string is a keyword/operator
-		if (Program.bindings.TryGetValue(line[i].Str, out tokenType)) {
+
+		if (line[i].Str == "-") {
+			if (i == 0 || Program.bindings.ContainsKey(line[i - 1].Str))
+				return Parse(line, i - 1, depth + 1);
+		}
+		
+		if (Program.bindings.TryGetValue(line[i].Str, out tokenType)) { // Check if string is a keyword/operator
 			t = (Token) Activator.CreateInstance(tokenType); // Instantiate the corresponding class
-			
+
 			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 			if (t is ArithmeticOperator) {
 				line[i].IsDone = true;
