@@ -4,7 +4,7 @@ namespace Interpreter.Tokens;
 
 public class NumberToken : Token {
 	public int Num;
-	
+
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
 		

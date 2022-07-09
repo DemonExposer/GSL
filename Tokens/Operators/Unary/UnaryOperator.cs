@@ -2,9 +2,9 @@ using System.Text;
 
 namespace Interpreter.Tokens.Operators; 
 
-public abstract class BinaryOperator : Token {
+public abstract class UnaryOperator : Token {
 	public string Symbol;
-	public Token Left = null!, Right = null!;
+	public Token Child = null!;
 	
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -15,15 +15,13 @@ public abstract class BinaryOperator : Token {
 		string indentStr = indentSb.ToString();
 		
 		sb.Append(indentStr).Append(Symbol).Append('\n');
-		if (Left != null)
-			sb.Append(Left.ToString(indent+1));
-		if (Right != null)
-			sb.Append(Right.ToString(indent+1));
+		if (Child != null)
+			sb.Append(Child.ToString(indent + 1));
 
 		return sb.ToString();
 	}
-
+	
 	public override int Size() {
-		return 1 + Left.Size() + Right.Size();
+		return 1 + Child.Size();
 	}
 }

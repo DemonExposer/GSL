@@ -1,4 +1,4 @@
-namespace Interpreter.Tokens.Operators.Arithmetic; 
+namespace Interpreter.Tokens.Operators.Binary.Arithmetic; 
 
 public abstract class ArithmeticOperator : BinaryOperator {
 	
