@@ -54,10 +54,10 @@ public class Program {
 
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
-			Console.Write("[");
-			foreach (Token t in tokenizedLine)
-				Console.Write("{0}, ", t.GetType());
-			Console.WriteLine("]");
+		//	Console.Write("[");
+		//	foreach (Token t in tokenizedLine)
+		//		Console.Write("{0}, ", t.GetType());
+		//	Console.WriteLine("]");
 			
 			int highestPriorityNum = -1;
 			int index = -1;
@@ -85,8 +85,8 @@ public class Program {
 				throw new FormatException("Line " + (i + 1) + " contains no expression");
 			
 			Token tree = Parser.Parse(tokenizedLine, index, 0);
-			Console.WriteLine(tree.ToString(0));
-		//	Console.WriteLine(tree.Evaluate());
+		//	Console.WriteLine(tree.ToString(0));
+			Console.WriteLine(tree.Evaluate());
 		}
 	}
 }

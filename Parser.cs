@@ -1,6 +1,3 @@
-using System.ComponentModel.Design;
-using System.Data;
-using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators;
 using Interpreter.Tokens.Operators.Binary;
@@ -20,7 +17,7 @@ public class Parser {
 				else if (line[j].Str == ")")
 					numBrackets += isRightBound ? -1 : 1;
 			}
-					
+
 			/*
 			 * Of course check for bounds and check whether this is the time when the brackets should be parsed
 			 * If there is an operator on the other side of the brackets,
@@ -32,14 +29,36 @@ public class Parser {
 			
 			return Parse(line, j, depth + 1);
 		}
+
+		/*
+		 * Why are the next variables not named j and numBrackets? Because of some super super super super weird bug_,
+		 * which makes the compiler think that those variables are already defined in the scope, when clearly, they aren't.
+		 * It is because of this COMPILE TIME BUG_, that runtime is blocked, even though the code would just work fine.
+		 * Also, you can't say bug_ normally or JetBrains Rider will think something of it
+		 */ 
 		
-		// If there is no operator on the other side, parse and
-		// if the other operator is above the current operator in the parse tree, parse too
-		if (isRightBound ? i + 2 >= line.Length || line[i+2].IsDone : i - 2 < 0 || line[i-2].IsDone)
-			return Parse(line, i + (isRightBound ? 1 : -1), depth + 1);
+		// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
+		// which is i+1 if rightbound (e.g. cur + b makes i+1 == "+") and k+1 if leftbound (e.g. -a + cur makes k+1 == "-")
+		int k = i + (isRightBound ? 1 : -1);
+		int bracketNum = 0;
+		while (bracketNum != 0 || (isRightBound ? k < line.Length : k >= 0) && line[k] is not BinaryOperator) {
+			if (line[k].Str == "(")
+				bracketNum++;
+			else if (line[k].Str == ")")
+				bracketNum--;
+			
+			k += isRightBound ? 1 : -1;
+		}
+
+		// BinaryOperator does not exist or is already done
+		if ((isRightBound ? k >= line.Length : k < 0) || line[k].IsDone)
+			if (!isRightBound)
+				return Parse(line, k + 1, depth + 1);
+			else
+				return Parse(line, i + 1, depth + 1);
 		
-		// Else, parse operator on the other side
-		return Parse(line, i + (isRightBound ? 2 : -2), depth + 1);
+		// BinaryOperator does exist and is not done, parse it
+		return Parse(line, k, depth + 1);
 	}
 
 	private static Token ParenthesesParse(Token[] line, int i, int depth, bool isRightBound) {
@@ -111,29 +130,25 @@ public class Parser {
 	
 	public static Token Parse(Token[] line, int i, int depth) {
 		Token t = line[i];
-		Type tokenType;
-
-		if (line[i].Str == "-") {
-			if (i == 0 || Program.bindings.ContainsKey(line[i - 1].Str))
-				return Parse(line, i - 1, depth + 1);
-		}
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
-		if (t is ArithmeticOperator) {
+		if (t is ArithmeticOperator arOp) {
 			line[i].IsDone = true;
 			
-			((ArithmeticOperator) t).Left = ArithmeticParse(line, i, depth, false);
-			((ArithmeticOperator) t).Right = ArithmeticParse(line, i, depth, true);
-		} else if (t is DeclarationOperator) {
-			((DeclarationOperator) t).SetVars(Program.vars);
-			((DeclarationOperator) t).Left = Parse(line, i + 1, depth+1);
-			((DeclarationOperator) t).Right = Parse(line, i + 3, depth+1); // Skip =
-		} else if (t is AssignmentOperator) {
-			((AssignmentOperator) t).SetVars(Program.vars);
-			((AssignmentOperator) t).Left = Parse(line, i - 1, depth+1);
-			((AssignmentOperator) t).Right = Parse(line, i + 1, depth+1);
-		} else if (t is ParenthesesOperator) {
-			((ParenthesesOperator) t).Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
+			arOp.Left = ArithmeticParse(line, i, depth, false);
+			arOp.Right = ArithmeticParse(line, i, depth, true);
+		} else if (t is DeclarationOperator decOp) { // TODO: get proper top operator
+			decOp.SetVars(Program.vars);
+			decOp.Left = Parse(line, i + 1, depth+1);
+			decOp.Right = Parse(line, i + 3, depth+1); // Skip =
+		} else if (t is AssignmentOperator assOp) { // TODO: get proper top operator
+			assOp.SetVars(Program.vars);
+			assOp.Left = Parse(line, i - 1, depth+1);
+			assOp.Right = Parse(line, i + 1, depth+1);
+		} else if (t is ParenthesesOperator parOp) {
+			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
+		} else if (t is MinusUnaryOperator minUnOp) {
+			minUnOp.Child = Parse(line, i + 1, depth + 1);
 		}
 
 		t.Line = line[i].Line;
