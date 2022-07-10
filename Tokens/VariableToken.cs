@@ -4,6 +4,7 @@ namespace Interpreter.Tokens;
 
 public class VariableToken : Token {
 	public string Name = null!;
+	public Token Args = null!;
 	private IDictionary<string, object> vars;
 
 	public VariableToken(IDictionary<string, object> vars) {
@@ -19,6 +20,9 @@ public class VariableToken : Token {
 		string indentStr = indentSb.ToString();
 
 		sb.Append(indentStr).Append(Name).Append('\n');
+
+		if (Args != null)
+			sb.Append(Args.ToString(indent + 1));
 
 		return sb.ToString();
 	}

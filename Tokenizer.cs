@@ -26,11 +26,6 @@ public class Tokenizer {
 				VariableToken vt = new VariableToken(Program.vars);
 				vt.Name = line[i].Str;
 				res[i] = vt;
-
-				if (i < line.Length-1 && line[i + 1].Str == "(") {
-					line[i + 1].IsDone = true;
-					// TODO: parse everything in the function call, and mark the second bracket as done
-				}
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {
 				NumberToken nt = new NumberToken();
 				nt.Num = Int32.Parse(line[i].Str);

@@ -8,25 +8,32 @@ namespace Interpreter;
 public class Parser {
 	private static Token ArithmeticParse(Token[] line, int i, int depth, bool isRightBound) {
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
-			// j will be the index of the operator on the other side of the brackets
-			int numBrackets = 1;
-			int j;
-			for (j = isRightBound ? i+2 : i-2; numBrackets > 0; j += isRightBound ? 1 : -1) {
+			// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
+			// which is i+1 if rightbound (e.g. cur + b makes i+1 == "+") and k+1 if leftbound (e.g. -a + cur makes j+1 == "-")
+			int j = i + (isRightBound ? 1 : -1);
+			int numBrackets = 0;
+			while (numBrackets != 0 || (isRightBound ? j < line.Length : j >= 0) && line[j] is not BinaryOperator) {
 				if (line[j].Str == "(")
-					numBrackets += isRightBound ? 1 : -1;
+					numBrackets++;
 				else if (line[j].Str == ")")
-					numBrackets += isRightBound ? -1 : 1;
+					numBrackets--;
+			
+				j += isRightBound ? 1 : -1;
 			}
 
 			/*
 			 * Of course check for bounds and check whether this is the time when the brackets should be parsed
-			 * If there is an operator on the other side of the brackets,
+			 * If there is a BinaryOperator on the other side of the brackets,
 			 * they should only be parsed when that operator is above the current operator in the parse tree.
 			 * Or in other words, the other operator should be done
 			 */
-			if ((isRightBound ? j >= line.Length : j <= 0) || line[j].IsDone)
-				return Parse(line, i + (isRightBound ? 1 : -1), depth + 1);
+			if ((isRightBound ? j >= line.Length : j < 0) || line[j].IsDone)
+				if (!isRightBound)
+					return Parse(line, j + 1, depth + 1);
+				else
+					return Parse(line, i + 1, depth + 1);
 			
+			// BinaryOperator does exist and is not done, parse it
 			return Parse(line, j, depth + 1);
 		}
 
@@ -149,6 +156,8 @@ public class Parser {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, depth + 1);
+		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
+			vt.Args = Parse(line, i + 1, depth + 1);
 		}
 
 		t.Line = line[i].Line;
