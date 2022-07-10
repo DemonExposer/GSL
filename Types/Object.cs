@@ -1,5 +1,8 @@
 namespace Interpreter.Types; 
 
-public class Object {
-	
+/**
+ * This class forces every other class that extends it to implement the ToString method
+ */
+public abstract class Object : LowObject {
+	public abstract override string ToString();
 }

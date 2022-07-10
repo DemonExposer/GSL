@@ -1,13 +1,16 @@
 using System.Text;
+using Interpreter.Types;
+using Interpreter.Types.Function;
+using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens; 
 
 public class VariableToken : Token {
 	public string Name = null!;
 	public Token Args = null!;
-	private IDictionary<string, object> vars;
+	private IDictionary<string, Object> vars;
 
-	public VariableToken(IDictionary<string, object> vars) {
+	public VariableToken(IDictionary<string, Object> vars) {
 		this.vars = vars;
 	}
 	
@@ -27,12 +30,15 @@ public class VariableToken : Token {
 		return sb.ToString();
 	}
 
-	public override int Evaluate() {
-		object res;
+	public override Object Evaluate() {
+		Object res;
 		if (!vars.TryGetValue(Name, out res))
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
-
-		return (int) res;
+		
+		if (res is Function f)
+			return f.Execute(new [] {new Integer(((Integer) Args.Evaluate()).Int)});
+		
+		return res;
 	}
 
 	public override int Size() {

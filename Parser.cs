@@ -2,6 +2,7 @@ using Interpreter.Tokens;
 using Interpreter.Tokens.Operators;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
+using Interpreter.Tokens.Operators.Unary;
 
 namespace Interpreter; 
 
@@ -68,6 +69,9 @@ public class Parser {
 		return Parse(line, k, depth + 1);
 	}
 
+	/**
+	 * Removes parentheses and parses inside expression by identifying the top operator and calling Parse
+	 */
 	private static Token ParenthesesParse(Token[] line, int i, int depth, bool isRightBound) {
 		int startIndex = -1;
 		int highestPriorityNum = -1;
@@ -109,7 +113,7 @@ public class Parser {
 
 			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
 			int priority;
-			if (Program.priorities.TryGetValue(line[j].Str, out priority)) {
+			if (line[j] is BinaryOperator && Program.priorities.TryGetValue(line[j].Str, out priority)) {
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = j;
@@ -157,7 +161,8 @@ public class Parser {
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, depth + 1);
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
-			vt.Args = Parse(line, i + 1, depth + 1);
+			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
+				vt.Args = Parse(line, i + 1, depth + 1);
 		}
 
 		t.Line = line[i].Line;

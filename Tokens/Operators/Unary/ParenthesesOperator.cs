@@ -1,3 +1,5 @@
+using Object = Interpreter.Types.Object;
+
 namespace Interpreter.Tokens.Operators; 
 
 public class ParenthesesOperator : UnaryOperator {
@@ -5,7 +7,7 @@ public class ParenthesesOperator : UnaryOperator {
 		Symbol = "()";
 	}
 	
-	public override int Evaluate() {
+	public override Object Evaluate() {
 		return Child.Evaluate();
 	}
 }
