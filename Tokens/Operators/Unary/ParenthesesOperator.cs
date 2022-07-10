@@ -1,6 +1,6 @@
 using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Tokens.Operators; 
+namespace Interpreter.Tokens.Operators.Unary; 
 
 public class ParenthesesOperator : UnaryOperator {
 	public ParenthesesOperator() {

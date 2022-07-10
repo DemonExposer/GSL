@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Interpreter.Tokens.Operators; 
+namespace Interpreter.Tokens.Operators.Unary; 
 
 public abstract class UnaryOperator : Token {
 	public string Symbol;

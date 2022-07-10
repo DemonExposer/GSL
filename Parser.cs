@@ -1,5 +1,4 @@
 using Interpreter.Tokens;
-using Interpreter.Tokens.Operators;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Unary;

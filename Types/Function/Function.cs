@@ -1,5 +1,3 @@
-using Interpreter.Tokens;
-
 namespace Interpreter.Types.Function; 
 
 public class Function : Object {
