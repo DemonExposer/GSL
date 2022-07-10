@@ -1,4 +1,6 @@
 using System.Text;
+using Interpreter.Types;
+using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens; 
 
@@ -18,8 +20,8 @@ public class NumberToken : Token {
 		return sb.ToString();
 	}
 
-	public override int Evaluate() {
-		return Num;
+	public override Object Evaluate() {
+		return new Integer(Num);
 	}
 
 	public override int Size() {

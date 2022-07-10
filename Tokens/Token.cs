@@ -1,3 +1,5 @@
+using Object = Interpreter.Types.Object;
+
 namespace Interpreter.Tokens;
 
 public abstract class Token {
@@ -6,6 +8,6 @@ public abstract class Token {
 	public string Str;
 
 	public abstract string ToString(int indent);
-	public abstract int Evaluate();
+	public abstract Object Evaluate();
 	public abstract int Size();
 }

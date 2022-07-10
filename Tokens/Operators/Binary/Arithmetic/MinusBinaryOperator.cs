@@ -1,3 +1,6 @@
+using Interpreter.Types;
+using Object = Interpreter.Types.Object;
+
 namespace Interpreter.Tokens.Operators.Binary.Arithmetic; 
 
 public class MinusBinaryOperator : ArithmeticOperator {
@@ -5,7 +8,7 @@ public class MinusBinaryOperator : ArithmeticOperator {
 		Symbol = "-";
 	}
 	
-	public override int Evaluate() {
-		return Left.Evaluate() - Right.Evaluate();
+	public override Object Evaluate() {
+		return new Integer(((Integer) Left.Evaluate()).Int - ((Integer) Right.Evaluate()).Int);
 	}
 }

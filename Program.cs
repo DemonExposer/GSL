@@ -1,8 +1,10 @@
-﻿using DefaultNamespace;
-using Interpreter.Tokens;
-using Interpreter.Tokens.Operators;
+﻿using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
+using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Types;
+using Interpreter.Types.Function;
+using Object = Interpreter.Types.Object;
 
 namespace Interpreter;
 
@@ -10,7 +12,7 @@ using System.Text.RegularExpressions;
 
 public class Program {
 	public static IDictionary<string, Type> bindings = new Dictionary<string, Type>();
-	public static IDictionary<string, object> vars = new Dictionary<string, object>();
+	public static IDictionary<string, Object> vars = new Dictionary<string, Object>();
 	public static IDictionary<string, int> priorities = new Dictionary<string, int>();
 
 	private static CheckedString[] CheckComment(CheckedString[] line) {
@@ -41,6 +43,10 @@ public class Program {
 		priorities.Add("-", 3);
 		priorities.Add("=", 4);
 		priorities.Add("decl", 5);
+		
+		// Standard defined variables
+		// TODO: Make sure print accepts an undefined number of params
+		vars.Add("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Integer), Name = "arg"}}, new Print(null!)));
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
@@ -81,10 +87,18 @@ public class Program {
 				}
 			}
 
-			if (index == -1)
-				throw new FormatException("Line " + (i + 1) + " contains no expression");
-			
-			Token tree = Parser.Parse(tokenizedLine, index, 0);
+			Token tree;
+			if (index == -1) {
+				if (tokenizedLine[0] is VariableToken) {
+					tree = Parser.Parse(tokenizedLine, 0, 0);
+					if (((VariableToken) tree).Args == null)
+						throw new FormatException("Line " + (i + 1) + " contains no expression");
+				} else
+					throw new FormatException("Line " + (i + 1) + " contains no expression");
+			} else {
+				tree = Parser.Parse(tokenizedLine, index, 0);
+			}
+
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();
 		}
