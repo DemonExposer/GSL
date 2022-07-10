@@ -44,7 +44,7 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z1-9]+|\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
