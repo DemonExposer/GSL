@@ -36,6 +36,7 @@ public class Tokenizer {
 			
 			
 			res[i].Str = line[i].Str;
+			res[i].Line = line[i].Line;
 		}
 
 		return res;
