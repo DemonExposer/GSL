@@ -1,6 +1,6 @@
 namespace Interpreter.Types.Function; 
 
-public struct FunctionArgument {
-	public Type ArgType;
-	public string Name;
+public class FunctionArgument {
+	public Type ArgType = null!;
+	public string Name = null!;
 }
