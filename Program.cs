@@ -99,7 +99,7 @@ public class Program {
 				tree = Parser.Parse(tokenizedLine, index, 0);
 			}
 
-		//	Console.WriteLine(tree.ToString(0));
+			Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();
 		}
 	}

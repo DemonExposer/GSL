@@ -2,6 +2,7 @@ using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Types;
 
 namespace Interpreter; 
 
@@ -150,7 +151,9 @@ public class Parser {
 		} else if (t is DeclarationOperator decOp) { // TODO: get proper top operator
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
-			decOp.Right = Parse(line, i + 3, depth+1); // Skip =
+			
+			if (i + 2 < line.Length) // Only Parse right hand side if it exists
+				decOp.Right = Parse(line, i + 2, depth + 1);
 		} else if (t is AssignmentOperator assOp) { // TODO: get proper top operator
 			assOp.SetVars(Program.vars);
 			assOp.Left = Parse(line, i - 1, depth+1);

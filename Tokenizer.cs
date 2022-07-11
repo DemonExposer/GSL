@@ -2,6 +2,7 @@ using System.Data;
 using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Types;
 
 namespace Interpreter; 
 
@@ -27,7 +28,7 @@ public class Tokenizer {
 				res[i] = vt;
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {
 				NumberToken nt = new NumberToken();
-				nt.Num = Int32.Parse(line[i].Str);
+				nt.Num = new Integer(Int32.Parse(line[i].Str));
 				res[i] = nt;
 			} else {
 				throw new InvalidExpressionException("Line " + line[i].Line + ": " + line[i].Str + " is not a valid expression");

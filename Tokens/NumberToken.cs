@@ -5,7 +5,7 @@ using Object = Interpreter.Types.Object;
 namespace Interpreter.Tokens; 
 
 public class NumberToken : Token {
-	public int Num;
+	public Integer Num;
 
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -15,13 +15,13 @@ public class NumberToken : Token {
 			indentSb.Append('\t');
 		string indentStr = indentSb.ToString();
 
-		sb.Append(indentStr).Append(Num).Append('\n');
+		sb.Append(indentStr).Append(Num.ToString()).Append('\n');
 
 		return sb.ToString();
 	}
 
 	public override Object Evaluate() {
-		return new Integer(Num);
+		return Num;
 	}
 
 	public override int Size() {
