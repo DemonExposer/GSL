@@ -2,11 +2,43 @@ using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Unary;
-using Interpreter.Types;
 
 namespace Interpreter; 
 
 public class Parser {
+	public static int GetTopElementIndex(Token[] line, int startIndex, int lineNum) {
+		int highestPriorityNum = -1;
+		int index = -1;
+		for (int i = startIndex; i < line.Length; i++) {
+			int priority;
+			if (line[i].Str == "(") {
+				int numBrackets = 1;
+				while (numBrackets > 0) {
+					i++;
+					if (line[i].Str == "(")
+						numBrackets++;
+					else if (line[i].Str == ")")
+						numBrackets--;
+				}
+			}
+			if (line[i] is BinaryOperator && Program.priorities.TryGetValue(line[i].Str, out priority)) {
+				if (priority >= highestPriorityNum) {
+					highestPriorityNum = priority;
+					index = i;
+				}
+			}
+		}
+
+		if (index == -1) {
+			if (line[startIndex] is VariableToken)
+				return startIndex;
+			
+			throw new FormatException("Line " + lineNum + " contains no expression");
+		}
+		
+		return index;
+	}
+	
 	private static Token ArithmeticParse(Token[] line, int i, int depth, bool isRightBound) {
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
 			// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
@@ -112,6 +144,7 @@ public class Parser {
 			}
 
 			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
+			// This should really go through GetTopElementIndex, but that would need an adaptation for leftbound cases
 			int priority;
 			if (line[j] is BinaryOperator && Program.priorities.TryGetValue(line[j].Str, out priority)) {
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
@@ -148,16 +181,18 @@ public class Parser {
 			
 			arOp.Left = ArithmeticParse(line, i, depth, false);
 			arOp.Right = ArithmeticParse(line, i, depth, true);
-		} else if (t is DeclarationOperator decOp) { // TODO: get proper top operator
+		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
 			
 			if (i + 2 < line.Length) // Only Parse right hand side if it exists
 				decOp.Right = Parse(line, i + 2, depth + 1);
-		} else if (t is AssignmentOperator assOp) { // TODO: get proper top operator
+		} else if (t is AssignmentOperator assOp) {
+			assOp.IsDone = true;
+			
 			assOp.SetVars(Program.vars);
 			assOp.Left = Parse(line, i - 1, depth+1);
-			assOp.Right = Parse(line, i + 1, depth+1);
+			assOp.Right = Parse(line, GetTopElementIndex(line, i+1, line[i].Line), depth+1);
 		} else if (t is ParenthesesOperator parOp) {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {

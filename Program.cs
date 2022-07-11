@@ -64,42 +64,10 @@ public class Program {
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
-			
-			int highestPriorityNum = -1;
-			int index = -1;
-			for (int j = 0; j < lexedLine.Length; j++) {
-				int priority;
-				if (tokenizedLine[j].Str == "(") {
-					int numBrackets = 1;
-					while (numBrackets > 0) {
-						j++;
-						if (tokenizedLine[j].Str == "(")
-							numBrackets++;
-						else if (tokenizedLine[j].Str == ")")
-							numBrackets--;
-					}
-				}
-				if (tokenizedLine[j] is BinaryOperator && priorities.TryGetValue(tokenizedLine[j].Str, out priority)) {
-					if (priority >= highestPriorityNum) {
-						highestPriorityNum = priority;
-						index = j;
-					}
-				}
-			}
 
-			Token tree;
-			if (index == -1) {
-				if (tokenizedLine[0] is VariableToken) {
-					tree = Parser.Parse(tokenizedLine, 0, 0);
-					if (((VariableToken) tree).Args == null)
-						throw new FormatException("Line " + (i + 1) + " contains no expression");
-				} else
-					throw new FormatException("Line " + (i + 1) + " contains no expression");
-			} else {
-				tree = Parser.Parse(tokenizedLine, index, 0);
-			}
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, i + 1), 0);
 
-			Console.WriteLine(tree.ToString(0));
+		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();
 		}
 	}
