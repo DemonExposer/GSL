@@ -1,6 +1,8 @@
-﻿using Interpreter.Tokens;
+﻿using Interpreter.BuiltinFunctions;
+using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
+using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types;
 using Interpreter.Types.Function;
@@ -29,20 +31,41 @@ public class Program {
 		bindings.Add("*", typeof(MultiplicationBinaryOperator));
 		bindings.Add("/", typeof(DivisionBinaryOperator));
 		bindings.Add("^", typeof(PowerBinaryOperator));
+		
 		bindings.Add("decl", typeof(DeclarationOperator));
 		bindings.Add("=", typeof(AssignmentOperator));
+		
 		bindings.Add("(", typeof(ParenthesesOperator));
 		bindings.Add(")", typeof(ParenthesesOperator));
+		
+		bindings.Add("&&", typeof(AndBinaryOperator));
+		bindings.Add("and", typeof(AndBinaryOperator));
+		bindings.Add("||", typeof(OrBinaryOperator));
+		bindings.Add("or", typeof(OrBinaryOperator));
+		bindings.Add("==", typeof(EqualityBinaryOperator));
+		bindings.Add("!=", typeof(InequalityBinaryOperator));
+		bindings.Add(">", typeof(LargerBinaryOperator));
+		bindings.Add("<", typeof(SmallerBinaryOperator));
+		bindings.Add("!", typeof(NotUnaryOperator));
 
 		// Low number for priority means a higher priority
 		priorities.Add("(", 0);
-		priorities.Add("^", 1);
-		priorities.Add("*", 2);
-		priorities.Add("/", 2);
-		priorities.Add("+", 3);
-		priorities.Add("-", 3);
-		priorities.Add("=", 4);
-		priorities.Add("decl", 5);
+		priorities.Add("!", 1);
+		priorities.Add(">", 2);
+		priorities.Add("<", 2);
+		priorities.Add("==", 3);
+		priorities.Add("!=", 3);
+		priorities.Add("&&", 4);
+		priorities.Add("and", 4);
+		priorities.Add("||", 5);
+		priorities.Add("or", 5);
+		priorities.Add("^", 6);
+		priorities.Add("*", 7);
+		priorities.Add("/", 7);
+		priorities.Add("+", 8);
+		priorities.Add("-", 8);
+		priorities.Add("=", 9);
+		priorities.Add("decl", 10);
 		
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params

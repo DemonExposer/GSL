@@ -1,6 +1,7 @@
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
+using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
 
 namespace Interpreter; 
@@ -178,9 +179,11 @@ public class Parser {
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 		if (t is ArithmeticOperator arOp) {
 			line[i].IsDone = true;
-			
+
 			arOp.Left = ArithmeticParse(line, i, depth, false);
 			arOp.Right = ArithmeticParse(line, i, depth, true);
+		} else if (t is BooleanOperator boolOp) {
+			// TODO: Implement. ArithmeticParse should probably work, if it does, rename it to BinaryOperatorParse
 		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
@@ -197,6 +200,8 @@ public class Parser {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, depth + 1);
+		} else if (t is NotUnaryOperator notUnOp) {
+			notUnOp.Child = Parse(line, i + 1, depth + 1);
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, depth + 1);
