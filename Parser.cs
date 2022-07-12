@@ -36,7 +36,7 @@ public class Parser {
 		return index;
 	}
 	
-	private static Token ArithmeticParse(Token[] line, int i, int depth, bool isRightBound) {
+	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, int depth, bool isRightBound) {
 		// BUG: fix this so that it does not move to the first BinaryOperator in sight, but instead the one with the least priority. Use GetTopElementIndex
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
 			// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
@@ -168,19 +168,13 @@ public class Parser {
 	
 	public static Token Parse(Token[] line, int i, int depth) {
 		Token t = line[i];
-	//	Console.WriteLine(line[i].Str);
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
-		if (t is ArithmeticOperator arOp) {
+		if (t is ArithmeticOperator or BooleanOperator) {
 			line[i].IsDone = true;
 
-			arOp.Left = ArithmeticParse(line, i, depth, false);
-			arOp.Right = ArithmeticParse(line, i, depth, true);
-		} else if (t is BooleanOperator boolOp) {
-			line[i].IsDone = true;
-			
-			boolOp.Left = ArithmeticParse(line, i, depth, false);
-			boolOp.Right = ArithmeticParse(line, i, depth, true);
+			((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line, i, depth, false);
+			((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(line, i, depth, true);
 		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
