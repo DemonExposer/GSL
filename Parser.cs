@@ -7,22 +7,26 @@ using Interpreter.Tokens.Operators.Unary;
 namespace Interpreter; 
 
 public class Parser {
-	public static int GetTopElementIndex(Token[] line, int startIndex, int lineNum) {
+	public static int GetTopElementIndex(Token[] line, int startIndex, bool isRightBound) {
 		int highestPriorityNum = -1;
 		int index = -1;
-		for (int i = startIndex; i < line.Length; i++) {
+		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
 			int priority;
-			if (line[i].Str == "(") {
-				int numBrackets = 1;
-				while (numBrackets > 0) {
-					i++;
-					if (line[i].Str == "(")
-						numBrackets++;
-					else if (line[i].Str == ")")
-						numBrackets--;
-				}
+			int numBrackets = 0;
+			if (line[i].Str == "(")
+				numBrackets++;
+			else if (line[i].Str == ")")
+				numBrackets--;
+			
+			while (numBrackets != 0) {
+				i += isRightBound ? 1 : -1;
+				if (line[i].Str == "(")
+					numBrackets++;
+				else if (line[i].Str == ")")
+					numBrackets--;
 			}
-			if (line[i] is BinaryOperator && Program.priorities.TryGetValue(line[i].Str, out priority)) {
+			
+			if (!line[i].IsDone && line[i] is BinaryOperator && Program.priorities.TryGetValue(line[i].Str, out priority)) {
 				if (priority >= highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = i;
@@ -38,10 +42,17 @@ public class Parser {
 	
 	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, int depth, bool isRightBound) {
 		// BUG: fix this so that it does not move to the first BinaryOperator in sight, but instead the one with the least priority. Use GetTopElementIndex
+
+	//	Console.WriteLine("{0} {1}", i, GetTopElementIndex(line, i, isRightBound));
+		foreach (Token t in line) 
+			Console.Write("{0}, ", t.Str);
+		Console.WriteLine();
+		Console.WriteLine("i: " + i);
+		
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
 			// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
 			// which is i+1 if rightbound (e.g. cur + b makes i+1 == "+") and k+1 if leftbound (e.g. -a + cur makes j+1 == "-")
-			int j = i + (isRightBound ? 1 : -1);
+		/*	int j = i + (isRightBound ? 1 : -1);
 			int numBrackets = 0;
 			while (numBrackets != 0 || (isRightBound ? j < line.Length : j >= 0) && line[j] is not BinaryOperator) {
 				if (line[j].Str == "(")
@@ -51,7 +62,8 @@ public class Parser {
 			
 				j += isRightBound ? 1 : -1;
 			}
-
+*/
+			int j = GetTopElementIndex(line, i, isRightBound);
 			/*
 			 * Of course check for bounds and check whether this is the time when the brackets should be parsed
 			 * If there is a BinaryOperator on the other side of the brackets,
@@ -59,12 +71,16 @@ public class Parser {
 			 * Or in other words, the other operator should be done
 			 */
 			if ((isRightBound ? j >= line.Length : j < 0) || line[j].IsDone)
-				if (!isRightBound)
+				if (!isRightBound) {
+					Console.WriteLine("j+1: " + (j + 1));
 					return Parse(line, j + 1, depth + 1);
-				else
+				} else {
+					Console.WriteLine("i+1: " + (i + 1));
 					return Parse(line, i + 1, depth + 1);
-			
+				}
+
 			// BinaryOperator does exist and is not done, parse it
+			Console.WriteLine("j: " + j);
 			return Parse(line, j, depth + 1);
 		}
 
@@ -77,7 +93,7 @@ public class Parser {
 		
 		// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
 		// which is i+1 if rightbound (e.g. cur + b makes i+1 == "+") and k+1 if leftbound (e.g. -a + cur makes k+1 == "-")
-		int k = i + (isRightBound ? 1 : -1);
+	/*	int k = i + (isRightBound ? 1 : -1);
 		int bracketNum = 0;
 		while (bracketNum != 0 || (isRightBound ? k < line.Length : k >= 0) && line[k] is not BinaryOperator) {
 			if (line[k].Str == "(")
@@ -87,15 +103,33 @@ public class Parser {
 			
 			k += isRightBound ? 1 : -1;
 		}
+*/	
+		int k = GetTopElementIndex(line, i, isRightBound);
+		if (k == i && !isRightBound) {
+			k = i - 1;
+			int bracketNum = 0;
+			while (bracketNum != 0 || k >= 0 && line[k] is not BinaryOperator) {
+				if (line[k].Str == "(")
+					bracketNum++;
+				else if (line[k].Str == ")")
+					bracketNum--;
+
+				k--;
+			}
+		}
 
 		// BinaryOperator does not exist or is already done
-		if ((isRightBound ? k >= line.Length : k < 0) || line[k].IsDone)
-			if (!isRightBound)
+		if (k < 0 || line[k].IsDone)
+			if (!isRightBound) {
+				Console.WriteLine("k+1: " + (k + 1));
 				return Parse(line, k + 1, depth + 1);
-			else
+			} else {
+				Console.WriteLine("i+1: " + (i + 1));
 				return Parse(line, i + 1, depth + 1);
-		
+			}
+
 		// BinaryOperator does exist and is not done, parse it
+		Console.WriteLine("k: " + k);
 		return Parse(line, k, depth + 1);
 	}
 
@@ -167,6 +201,9 @@ public class Parser {
 	}
 	
 	public static Token Parse(Token[] line, int i, int depth) {
+		if (depth > 10)
+			throw new StackOverflowException();
+		
 		Token t = line[i];
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
@@ -186,7 +223,7 @@ public class Parser {
 			
 			assOp.SetVars(Program.vars);
 			assOp.Left = Parse(line, i - 1, depth+1);
-			assOp.Right = Parse(line, GetTopElementIndex(line, i+1, line[i].Line), depth+1);
+			assOp.Right = Parse(line, GetTopElementIndex(line, i+1, true), depth+1);
 		} else if (t is ParenthesesOperator parOp) {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
