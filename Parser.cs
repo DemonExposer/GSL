@@ -1,6 +1,7 @@
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
+using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
 
 namespace Interpreter; 
@@ -29,17 +30,14 @@ public class Parser {
 			}
 		}
 
-		if (index == -1) {
-			if (line[startIndex] is VariableToken)
-				return startIndex;
-			
-			throw new FormatException("Line " + lineNum + " contains no expression");
-		}
-		
+		if (index == -1)
+			return startIndex;
+
 		return index;
 	}
 	
 	private static Token ArithmeticParse(Token[] line, int i, int depth, bool isRightBound) {
+		// BUG: fix this so that it does not move to the first BinaryOperator in sight, but instead the one with the least priority. Use GetTopElementIndex
 		if (isRightBound ? line[i + 1].Str == "(" : line[i - 1].Str == ")") {
 			// Move to first BinaryOperator in sight. If that does not exist or is already done, move to closest highest level token
 			// which is i+1 if rightbound (e.g. cur + b makes i+1 == "+") and k+1 if leftbound (e.g. -a + cur makes j+1 == "-")
@@ -154,12 +152,8 @@ public class Parser {
 			}
 		}
 		
-		if (index == -1) {
-			Console.ForegroundColor = ConsoleColor.Yellow;
-			Console.WriteLine("Warning: Double brackets on line " + line[i].Line);
-			Console.ResetColor();
-			index = startIndex; // Make sure index-startIndex is 0
-		}
+		if (index == -1)
+			index = startIndex; // This makes sure index-startIndex is 0, because the first and only element should be parsed
 
 		if (startIndex == -1) {
 			Console.ForegroundColor = ConsoleColor.Red;
@@ -174,13 +168,20 @@ public class Parser {
 	
 	public static Token Parse(Token[] line, int i, int depth) {
 		Token t = line[i];
+	//	Console.WriteLine(line[i].Str);
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 		if (t is ArithmeticOperator arOp) {
 			line[i].IsDone = true;
-			
+
 			arOp.Left = ArithmeticParse(line, i, depth, false);
 			arOp.Right = ArithmeticParse(line, i, depth, true);
+		} else if (t is BooleanOperator boolOp) {
+			line[i].IsDone = true;
+			
+			boolOp.Left = ArithmeticParse(line, i, depth, false);
+			boolOp.Right = ArithmeticParse(line, i, depth, true);
+			// TODO: Implement. ArithmeticParse should probably work, if it does, rename it to BinaryOperatorParse
 		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
@@ -197,6 +198,8 @@ public class Parser {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, depth + 1);
+		} else if (t is NotUnaryOperator notUnOp) {
+			notUnOp.Child = Parse(line, i + 1, depth + 1);
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, depth + 1);

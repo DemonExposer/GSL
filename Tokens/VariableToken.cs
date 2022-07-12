@@ -36,7 +36,7 @@ public class VariableToken : Token {
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
 		
 		if (res is Function f)
-			return f.Execute(new [] {new Integer(((Integer) Args.Evaluate()).Int)});
+			return f.Execute(new [] {Args.Evaluate()});
 		
 		return res;
 	}

@@ -1,8 +1,9 @@
 using System.Text;
 using Interpreter.Tokens;
 using Interpreter.Types.Function;
+using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Types; 
+namespace Interpreter.BuiltinFunctions; 
 
 public class Print : FunctionBody {
 	public Print(Token[] expressions) : base(expressions) { }
