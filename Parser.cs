@@ -30,13 +30,9 @@ public class Parser {
 			}
 		}
 
-		if (index == -1) {
-			if (line[startIndex] is VariableToken)
-				return startIndex;
-			
-			throw new FormatException("Line " + lineNum + " contains no expression");
-		}
-		
+		if (index == -1)
+			return startIndex;
+
 		return index;
 	}
 	
@@ -159,7 +155,7 @@ public class Parser {
 			Console.ForegroundColor = ConsoleColor.Yellow;
 			Console.WriteLine("Warning: Double brackets on line " + line[i].Line);
 			Console.ResetColor();
-			index = startIndex; // Make sure index-startIndex is 0
+			index = startIndex; // This makes sure index-startIndex is 0, because the first and only element should be parsed
 		}
 
 		if (startIndex == -1) {
@@ -175,6 +171,7 @@ public class Parser {
 	
 	public static Token Parse(Token[] line, int i, int depth) {
 		Token t = line[i];
+	//	Console.WriteLine(line[i].Str);
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
 		if (t is ArithmeticOperator arOp) {
@@ -183,6 +180,7 @@ public class Parser {
 			arOp.Left = ArithmeticParse(line, i, depth, false);
 			arOp.Right = ArithmeticParse(line, i, depth, true);
 		} else if (t is BooleanOperator boolOp) {
+			Console.WriteLine(boolOp.Str);
 			// TODO: Implement. ArithmeticParse should probably work, if it does, rename it to BinaryOperatorParse
 		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);

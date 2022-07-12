@@ -73,7 +73,7 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|\\d+|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|==|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
@@ -90,8 +90,8 @@ public class Program {
 
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, i + 1), 0);
 
-		//	Console.WriteLine(tree.ToString(0));
-			tree.Evaluate();
+			Console.WriteLine(tree.ToString(0));
+		//	tree.Evaluate();
 		}
 	}
 }
