@@ -181,7 +181,6 @@ public class Parser {
 			
 			boolOp.Left = ArithmeticParse(line, i, depth, false);
 			boolOp.Right = ArithmeticParse(line, i, depth, true);
-			// TODO: Implement. ArithmeticParse should probably work, if it does, rename it to BinaryOperatorParse
 		} else if (t is DeclarationOperator decOp) {
 			decOp.SetVars(Program.vars);
 			decOp.Left = Parse(line, i + 1, depth+1);
