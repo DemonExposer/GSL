@@ -97,9 +97,9 @@ public class Program {
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, i + 1), 0);
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), 0);
 
-			Console.WriteLine(tree.ToString(0));
+		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();
 		}
 	}
