@@ -5,4 +5,6 @@ namespace Interpreter.Types;
  */
 public abstract class Object : LowObject {
 	public abstract override string ToString();
+
+	public abstract override string GetType();
 }

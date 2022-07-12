@@ -30,5 +30,9 @@ public class Function : Object {
 	public override string ToString() {
 		return "Function";
 	}
+
+	public override string GetType() {
+		return "Function";
+	}
 }
 

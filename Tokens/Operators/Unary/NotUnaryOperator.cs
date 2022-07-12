@@ -1,4 +1,4 @@
-using Boolean = Interpreter.Types.Boolean;
+using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Operators.Unary; 

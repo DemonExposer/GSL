@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types;
+using Interpreter.Types.Comparable;
 
 namespace Interpreter; 
 

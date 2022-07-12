@@ -8,6 +8,6 @@ public class OrBinaryOperator : BooleanOperator {
 	}
 	
 	public override Object Evaluate() {
-		return new Types.Boolean(((Types.Boolean) Left.Evaluate()).Bool || ((Types.Boolean) Right.Evaluate()).Bool);
+		return new Types.Comparable.Boolean(((Types.Comparable.Boolean) Left.Evaluate()).Bool || ((Types.Comparable.Boolean) Right.Evaluate()).Bool);
 	}
 }

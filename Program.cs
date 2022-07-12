@@ -5,7 +5,9 @@ using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types;
+using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
+using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter;
@@ -46,6 +48,8 @@ public class Program {
 		bindings.Add("!=", typeof(InequalityBinaryOperator));
 		bindings.Add(">", typeof(LargerBinaryOperator));
 		bindings.Add("<", typeof(SmallerBinaryOperator));
+		bindings.Add("<=", typeof(SmallerEqualBinaryOperator));
+		bindings.Add(">=", typeof(LargerEqualBinaryOperator));
 		bindings.Add("!", typeof(NotUnaryOperator));
 
 		// Low number for priority means a higher priority
@@ -53,6 +57,8 @@ public class Program {
 		priorities.Add("!", 1);
 		priorities.Add(">", 2);
 		priorities.Add("<", 2);
+		priorities.Add("<=", 2);
+		priorities.Add(">=", 2);
 		priorities.Add("==", 3);
 		priorities.Add("!=", 3);
 		priorities.Add("&&", 4);
@@ -69,11 +75,14 @@ public class Program {
 		
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params
-		vars.Add("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Integer), Name = "arg"}}, new Print(null!)));
+		vars.Add("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "arg"}}, new Print(null!)));
+		vars.Add("false", new Boolean(false));
+		vars.Add("true", new Boolean(true));
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|==|[\\^*/+-=()#])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			// Regex matching all valid strings, with the least complicated in the back so that e.g. == gets matched as == and not as =, =
+			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|==|!=|\\|\\||&&|>=|<=|[\\^*/+-=()#<>!])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
@@ -91,7 +100,7 @@ public class Program {
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, i + 1), 0);
 
 			Console.WriteLine(tree.ToString(0));
-		//	tree.Evaluate();
+			tree.Evaluate();
 		}
 	}
 }
