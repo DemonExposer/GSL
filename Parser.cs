@@ -31,7 +31,7 @@ public class Parser {
 			} catch (KeyNotFoundException) { }
 			
 			if (!line[i].IsDone && line[i] is BinaryOperator && priority != -1) {
-				if (priority >= highestPriorityNum) {
+				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = i;
 				}
@@ -165,7 +165,8 @@ public class Parser {
 			
 			assOp.SetVars(Program.vars);
 			assOp.Left = Parse(line, i - 1, depth+1);
-			assOp.Right = Parse(line, GetTopElementIndex(line, i+1, true), depth+1);
+			Token[] thing = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
+			assOp.Right = Parse(thing, GetTopElementIndex(thing, 1, true), depth+1);
 		} else if (t is ParenthesesOperator parOp) {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
