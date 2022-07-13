@@ -56,7 +56,7 @@ public class Program {
 		bindings.Insert("!", typeof(NotUnaryOperator));
 		
 		// Statements
-		bindings.Insert("if", typeof(IfStatement));
+		bindings.Insert("on", typeof(OnStatement));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
@@ -103,7 +103,8 @@ public class Program {
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), 0);
+			int startIndex = tokenizedLine[i] is OnStatement ? 0 : Parser.GetTopElementIndex(tokenizedLine, 0, true);
+			Token tree = Parser.Parse(tokenizedLine, startIndex, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();

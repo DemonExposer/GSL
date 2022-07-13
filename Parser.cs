@@ -3,6 +3,7 @@ using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Tokens.Statements;
 
 namespace Interpreter; 
 
@@ -165,8 +166,8 @@ public class Parser {
 			
 			assOp.SetVars(Program.vars);
 			assOp.Left = Parse(line, i - 1, depth+1);
-			Token[] thing = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
-			assOp.Right = Parse(thing, GetTopElementIndex(thing, 1, true), depth+1);
+			Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
+			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), depth+1);
 		} else if (t is ParenthesesOperator parOp) {
 			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
@@ -176,6 +177,27 @@ public class Parser {
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, depth + 1);
+		} else if (t is OnStatement onS) {
+			Token left = Parse(line, i + 1, depth + 1);
+			if (left is not ParenthesesOperator po)
+				throw new FormatException("if statement condition on line " + left.Line + " is missing parentheses");
+			
+			onS.Left = po;
+			
+			// TODO: remove this temporary parsing method for only one line if statements
+			int numBrackets = 0;
+			int j = i+1;
+			do {
+				if (line[j].Str == ")")
+					numBrackets--;
+				else if (line[j].Str == "(")
+					numBrackets++;
+				
+				j++;
+			} while (numBrackets != 0);
+			
+			Token[] subLine = new ArraySegment<Token>(line, j, line.Length - j).ToArray();
+			onS.Right = Parse(subLine, GetTopElementIndex(subLine, 0, true), depth+1);
 		}
 
 		t.Line = line[i].Line;

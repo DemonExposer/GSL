@@ -5,8 +5,8 @@ using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Statements; 
 
-public class IfStatement : Token {
-	public string Symbol = "if";
+public class OnStatement : Token {
+	public string Symbol = "on";
 	public ParenthesesOperator Left = null!;
 	public Token Right = null!;
 
