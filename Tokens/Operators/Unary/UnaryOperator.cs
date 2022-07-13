@@ -3,7 +3,7 @@ using System.Text;
 namespace Interpreter.Tokens.Operators.Unary; 
 
 public abstract class UnaryOperator : Token {
-	public string Symbol;
+	public string Symbol = null!;
 	public Token Child = null!;
 	
 	public override string ToString(int indent) {
@@ -15,7 +15,7 @@ public abstract class UnaryOperator : Token {
 		string indentStr = indentSb.ToString();
 		
 		sb.Append(indentStr).Append(Symbol).Append('\n');
-		if (Child != null)
+		if (Child != null!)
 			sb.Append(Child.ToString(indent + 1));
 
 		return sb.ToString();

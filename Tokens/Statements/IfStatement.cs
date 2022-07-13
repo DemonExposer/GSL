@@ -1,11 +1,15 @@
 using System.Text;
+using Interpreter.Tokens.Operators.Unary;
+using Boolean = Interpreter.Types.Comparable.Boolean;
+using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Tokens.Operators.Binary; 
+namespace Interpreter.Tokens.Statements; 
 
-public abstract class BinaryOperator : Token {
-	public string Symbol = null!;
-	public Token Left = null!, Right = null!;
-	
+public class IfStatement : Token {
+	public string Symbol = "if";
+	public ParenthesesOperator Left = null!;
+	public Token Right = null!;
+
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
 		
@@ -21,6 +25,13 @@ public abstract class BinaryOperator : Token {
 			sb.Append(Right.ToString(indent+1));
 
 		return sb.ToString();
+	}
+
+	public override Object Evaluate() {
+		if (((Boolean) Left.Evaluate()).Bool)
+			return Right.Evaluate();
+
+		return null!;
 	}
 
 	public override int Size() {

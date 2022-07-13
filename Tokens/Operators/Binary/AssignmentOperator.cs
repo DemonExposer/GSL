@@ -4,7 +4,7 @@ using TrieDictionary;
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class AssignmentOperator : BinaryOperator {
-	private TrieDictionary<Object> vars;
+	private TrieDictionary<Object> vars = null!;
 	
 	public AssignmentOperator() {
 		Symbol = "=";

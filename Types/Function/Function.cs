@@ -3,7 +3,7 @@ using TrieDictionary;
 namespace Interpreter.Types.Function; 
 
 public class Function : Object {
-	private TrieDictionary<Object> vars;
+	private TrieDictionary<Object> vars = null!;
 	public FunctionArgument[] Args;
 	private FunctionBody body;
 

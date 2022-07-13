@@ -5,7 +5,7 @@ using TrieDictionary;
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class DeclarationOperator : BinaryOperator {
-	private TrieDictionary<Object> vars;
+	private TrieDictionary<Object> vars = null!;
 	
 	public DeclarationOperator() {
 		Symbol = "decl";

@@ -4,14 +4,14 @@ using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Tokens.Statements;
 using Interpreter.Types.Function;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
+using System.Text.RegularExpressions;
 
 namespace Interpreter;
-
-using System.Text.RegularExpressions;
 
 public class Program {
 	public static TrieDictionary<Type> bindings = new ();
@@ -27,18 +27,22 @@ public class Program {
 	}
 
 	public static void Main(string[] args) {
+		// Arithmetic
 		bindings.Insert("+", typeof(PlusBinaryOperator));
 		bindings.Insert("-", typeof(MinusBinaryOperator));
 		bindings.Insert("*", typeof(MultiplicationBinaryOperator));
 		bindings.Insert("/", typeof(DivisionBinaryOperator));
 		bindings.Insert("^", typeof(PowerBinaryOperator));
 		
+		// Variable initialization
 		bindings.Insert("decl", typeof(DeclarationOperator));
 		bindings.Insert("=", typeof(AssignmentOperator));
 		
+		// Brackets
 		bindings.Insert("(", typeof(ParenthesesOperator));
 		bindings.Insert(")", typeof(ParenthesesOperator));
 		
+		// Boolean logic
 		bindings.Insert("&&", typeof(AndBinaryOperator));
 		bindings.Insert("and", typeof(AndBinaryOperator));
 		bindings.Insert("||", typeof(OrBinaryOperator));
@@ -50,6 +54,9 @@ public class Program {
 		bindings.Insert("<=", typeof(SmallerEqualBinaryOperator));
 		bindings.Insert(">=", typeof(LargerEqualBinaryOperator));
 		bindings.Insert("!", typeof(NotUnaryOperator));
+		
+		// Statements
+		bindings.Insert("if", typeof(IfStatement));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);

@@ -6,7 +6,7 @@ using Object = Interpreter.Types.Object;
 namespace Interpreter.Tokens; 
 
 public class NumberToken : Token {
-	public Integer Num;
+	public Integer Num = null!;
 
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
