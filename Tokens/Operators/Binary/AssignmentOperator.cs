@@ -1,25 +1,29 @@
 using Object = Interpreter.Types.Object;
+using TrieDictionary;
 
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class AssignmentOperator : BinaryOperator {
-	private IDictionary<string, Object> vars;
+	private TrieDictionary<Object> vars;
 	
 	public AssignmentOperator() {
 		Symbol = "=";
 	}
 	
-	public void SetVars(IDictionary<string, Object> vars) {
+	public void SetVars(TrieDictionary<Object> vars) {
 		this.vars = vars;
 	}
 	
 	public override Object Evaluate() {
-		if (!vars.ContainsKey(((VariableToken) Left).Name))
+		try {
+			vars.Get(((VariableToken) Left).Name);
+		} catch (KeyNotFoundException) {
 			throw new KeyNotFoundException("Line " + Line + ": Trying to assign value to undeclared variable " + ((VariableToken) Left).Name);
+		}
 
 		Object res = Right.Evaluate();
 		vars.Remove(((VariableToken) Left).Name);
-		vars.Add(((VariableToken) Left).Name, res);
+		vars[((VariableToken) Left).Name] = res;
 		
 		return res;
 	}

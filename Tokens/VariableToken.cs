@@ -1,16 +1,16 @@
 using System.Text;
-using Interpreter.Types;
 using Interpreter.Types.Function;
 using Object = Interpreter.Types.Object;
+using TrieDictionary;
 
-namespace Interpreter.Tokens; 
+namespace Interpreter.Tokens;
 
 public class VariableToken : Token {
 	public string Name = null!;
 	public Token Args = null!;
-	private IDictionary<string, Object> vars;
+	private TrieDictionary<Object> vars;
 
-	public VariableToken(IDictionary<string, Object> vars) {
+	public VariableToken(TrieDictionary<Object> vars) {
 		this.vars = vars;
 	}
 	
@@ -32,9 +32,13 @@ public class VariableToken : Token {
 
 	public override Object Evaluate() {
 		Object res;
-		if (!vars.TryGetValue(Name, out res))
+
+		try {
+			res = vars[Name];
+		} catch (KeyNotFoundException) {
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
-		
+		}
+
 		if (res is Function f)
 			return f.Execute(new [] {Args.Evaluate()});
 		

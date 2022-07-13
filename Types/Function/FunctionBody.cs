@@ -1,4 +1,5 @@
 using Interpreter.Tokens;
+using TrieDictionary;
 
 namespace Interpreter.Types.Function; 
 
@@ -9,7 +10,7 @@ public class FunctionBody {
 		this.expressions = expressions;
 	}
 
-	public virtual Object Execute(Object[] args, IDictionary<string, Object> vars) {
+	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars) {
 		throw new NotImplementedException();
 	}
 }

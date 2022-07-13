@@ -13,16 +13,25 @@ public class Tokenizer {
 		
 		for (int i = 0; i < line.Length; i++) {
 			if (line[i].Str == "-") { // Minus is unary when it is the first token or if the previous token is an operator
-				if (i == 0 || Program.bindings.ContainsKey(line[i - 1].Str)) {
+				Type prevType = null!;
+				try {
+					prevType = Program.bindings[line[i - 1].Str];
+				} catch (KeyNotFoundException) { }
+				
+				if (i == 0 || prevType != null!) {
 					res[i] = new MinusUnaryOperator();
 					res[i].Str = line[i].Str;
 					continue;
 				}
 			}
 
-			Type tokenType;
-			if (Program.bindings.TryGetValue(line[i].Str, out tokenType)) { // Check if string is a keyword/operator
-				res[i] = (Token) Activator.CreateInstance(tokenType); // Instantiate the corresponding class
+			Type tokenType = null!;
+			try {
+				tokenType = Program.bindings[line[i].Str];
+			} catch (KeyNotFoundException) { }
+			
+			if (tokenType != null!) { // Check if string is a keyword/operator
+				res[i] = (Token) Activator.CreateInstance(tokenType)!; // Instantiate the corresponding class
 			} else if (Regex.Matches(line[i].Str, "^[a-zA-Z]\\w*$").Count == 1) {
 				VariableToken vt = new VariableToken(Program.vars);
 				vt.Name = line[i].Str;
