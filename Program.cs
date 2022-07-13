@@ -103,7 +103,7 @@ public class Program {
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 
-			int startIndex = tokenizedLine[i] is OnStatement ? 0 : Parser.GetTopElementIndex(tokenizedLine, 0, true);
+			int startIndex = tokenizedLine[i] is Statement ? 0 : Parser.GetTopElementIndex(tokenizedLine, 0, true);
 			Token tree = Parser.Parse(tokenizedLine, startIndex, 0);
 
 		//	Console.WriteLine(tree.ToString(0));

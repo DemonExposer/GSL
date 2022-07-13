@@ -5,7 +5,7 @@ using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Statements; 
 
-public class OnStatement : Token {
+public class OnStatement : Statement {
 	public string Symbol = "on";
 	public ParenthesesOperator Left = null!;
 	public Token Right = null!;
