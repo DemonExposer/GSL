@@ -1,23 +1,23 @@
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
+using TrieDictionary;
 
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class DeclarationOperator : BinaryOperator {
-	private IDictionary<string, Object> vars;
+	private TrieDictionary<Object> vars;
 	
 	public DeclarationOperator() {
 		Symbol = "decl";
 	}
 
-	public void SetVars(IDictionary<string, Object> vars) {
+	public void SetVars(TrieDictionary<Object> vars) {
 		this.vars = vars;
 	}
 	
 	public override Object Evaluate() {
 		Object res = new Integer(0); // TODO: Make this default to null instead of 0
-		vars.Add(((VariableToken) Left).Name, res);
+		vars[((VariableToken) Left).Name] = res;
 
 		if (Right is AssignmentOperator)
 			return Right.Evaluate();

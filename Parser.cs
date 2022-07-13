@@ -11,7 +11,7 @@ public class Parser {
 		int highestPriorityNum = -1;
 		int index = -1;
 		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
-			int priority;
+			int priority = -1;
 			int numBrackets = 0;
 			if (line[i].Str == "(")
 				numBrackets++;
@@ -26,7 +26,11 @@ public class Parser {
 					numBrackets--;
 			}
 			
-			if (!line[i].IsDone && line[i] is BinaryOperator && Program.priorities.TryGetValue(line[i].Str, out priority)) {
+			try {
+				priority = Program.priorities[line[i].Str];
+			} catch (KeyNotFoundException) { }
+			
+			if (!line[i].IsDone && line[i] is BinaryOperator && priority != -1) {
 				if (priority >= highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = i;
@@ -113,8 +117,12 @@ public class Parser {
 
 			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
 			// This should really go through GetTopElementIndex, but that would need an adaptation for leftbound cases
-			int priority;
-			if (line[j] is BinaryOperator && Program.priorities.TryGetValue(line[j].Str, out priority)) {
+			int priority = -1;
+			try {
+				priority = Program.priorities[line[j].Str];
+			} catch (KeyNotFoundException) { }
+			
+			if (line[j] is BinaryOperator && priority != -1) {
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = j;

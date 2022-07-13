@@ -1,7 +1,9 @@
+using TrieDictionary;
+
 namespace Interpreter.Types.Function; 
 
 public class Function : Object {
-	private IDictionary<string, Object> vars;
+	private TrieDictionary<Object> vars;
 	public FunctionArgument[] Args;
 	private FunctionBody body;
 
@@ -11,7 +13,7 @@ public class Function : Object {
 	}
 
 	public Object Execute(Object[] args) {
-		vars = new Dictionary<string, Object>();
+		vars = new TrieDictionary<Object>();
 		
 		if (args.Length != Args.Length)
 			throw new InvalidOperationException("Args incorrect length: is: " + args.Length + ", should be: " +
@@ -21,7 +23,7 @@ public class Function : Object {
 			if (!Args[i].ArgType.IsInstanceOfType(args[i]))
 				throw new InvalidOperationException("Incorrect argument type for argument " + i);
 			
-			vars.Add(Args[i].Name, args[i]);
+			vars[Args[i].Name] = args[i];
 		}
 
 		return body.Execute(args, vars);
