@@ -1,11 +1,36 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {}
+    "net6.0": {
+      "TrieDictionary/1.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/TrieDictionary.dll": {}
+        },
+        "runtime": {
+          "lib/net6.0/TrieDictionary.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "TrieDictionary/1.0.0": {
+      "sha512": "AekY+umBCNILfV3ErtGLtJl8uud22e8wpM08H48DgtKf8p1EtBzRz/ziZx7IURQ+ffSPUzCRf9ofazbIzqAS3A==",
+      "type": "package",
+      "path": "triedictionary/1.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net6.0/TrieDictionary.dll",
+        "triedictionary.1.0.0.nupkg.sha512",
+        "triedictionary.nuspec"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0": []
+    "net6.0": [
+      "TrieDictionary >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "/home/kelvin/.nuget/packages/": {}
@@ -43,6 +68,12 @@
     "frameworks": {
       "net6.0": {
         "targetAlias": "net6.0",
+        "dependencies": {
+          "TrieDictionary": {
+            "target": "Package",
+            "version": "[1.0.0, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",

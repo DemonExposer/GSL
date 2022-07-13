@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "zLU/aCkX32yiqZhhU1yqYkjnDluzwLUZV76MApeCBHfGJuTEl9MqDQzYmtb6Tn/CNHBhiwuVcb4ZvVcnIvF5Lg==",
+  "dgSpecHash": "qFbp0DL927BCt+k6gdW2EtORSPXh1dGRXt+vJMO8u6DTgUAJhgfMWu6/z1jPqBBGm3zqi/UEuHZk49i4/4Ss2Q==",
   "success": true,
   "projectFilePath": "/home/kelvin/RiderProjects/GSL/Interpreter.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/kelvin/.nuget/packages/triedictionary/1.0.0/triedictionary.1.0.0.nupkg.sha512"
+  ],
   "logs": []
 }
