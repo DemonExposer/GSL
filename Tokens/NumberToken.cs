@@ -25,7 +25,5 @@ public class NumberToken : Token {
 		return Num;
 	}
 
-	public override int Size() {
-		return 1;
-	}
+	public override int Size() => 1;
 }

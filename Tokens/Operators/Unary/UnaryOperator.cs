@@ -21,7 +21,5 @@ public abstract class UnaryOperator : Token {
 		return sb.ToString();
 	}
 	
-	public override int Size() {
-		return 1 + Child.Size();
-	}
+	public override int Size() => 1 + Child.Size();
 }

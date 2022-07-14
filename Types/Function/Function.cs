@@ -29,12 +29,8 @@ public class Function : Object {
 		return body.Execute(args, vars);
 	}
 
-	public override string ToString() {
-		return "Function";
-	}
+	public override string ToString() => "Function";
 
-	public override string GetType() {
-		return "Function";
-	}
+	public override string GetType() => "Function";
 }
 

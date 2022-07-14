@@ -1,4 +1,3 @@
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 
@@ -9,7 +8,5 @@ public class MinusUnaryOperator : UnaryOperator {
 		Symbol = "-";
 	}
 	
-	public override Object Evaluate() {
-		return new Integer(-((Integer) Child.Evaluate()).Int);
-	}
+	public override Object Evaluate() => new Integer(-((Integer) Child.Evaluate()).Int); 
 }

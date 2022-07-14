@@ -45,7 +45,5 @@ public class VariableToken : Token {
 		return res;
 	}
 
-	public override int Size() {
-		return 1;
-	}
+	public override int Size() => 1;
 }

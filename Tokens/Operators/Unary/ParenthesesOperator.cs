@@ -7,7 +7,5 @@ public class ParenthesesOperator : UnaryOperator {
 		Symbol = "()";
 	}
 	
-	public override Object Evaluate() {
-		return Child.Evaluate();
-	}
+	public override Object Evaluate() => Child.Evaluate();
 }

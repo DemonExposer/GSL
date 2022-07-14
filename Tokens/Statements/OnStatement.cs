@@ -27,14 +27,7 @@ public class OnStatement : Statement {
 		return sb.ToString();
 	}
 
-	public override Object Evaluate() {
-		if (((Boolean) Left.Evaluate()).Bool)
-			return Right.Evaluate();
+	public override Object Evaluate() => ((Boolean) Left.Evaluate()).Bool ? Right.Evaluate() : null!;
 
-		return null!;
-	}
-
-	public override int Size() {
-		return 1 + Left.Size() + Right.Size();
-	}
+	public override int Size() => 1 + Left.Size() + Right.Size();
 }
