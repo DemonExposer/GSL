@@ -10,21 +10,14 @@ using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 using System.Text.RegularExpressions;
+using Interpreter.Tokens.Operators.N_Ary;
 
 namespace Interpreter;
 
 public class Program {
 	public static TrieDictionary<Type> bindings = new ();
-	public static TrieDictionary<Object> vars = new ();
+	private static TrieDictionary<Object> vars = new ();
 	public static TrieDictionary<int> priorities = new ();
-
-	private static CheckedString[] CheckComment(CheckedString[] line) {
-		for (int i = 0; i < line.Length; i++)
-			if (line[i].Str == "#")
-				return line.Take(i).ToArray();
-
-		return line;
-	}
 
 	public static void Main(string[] args) {
 		// Arithmetic
@@ -41,6 +34,8 @@ public class Program {
 		// Brackets
 		bindings.Insert("(", typeof(ParenthesesOperator));
 		bindings.Insert(")", typeof(ParenthesesOperator));
+		bindings.Insert("{", typeof(MultiLineStatementOperator));
+		bindings.Insert("}", typeof(MultiLineStatementOperator));
 		
 		// Boolean logic
 		bindings.Insert("&&", typeof(AndBinaryOperator));
@@ -87,24 +82,22 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			// Regex matching all valid strings, with the least complicated in the back so that e.g. == gets matched as == and not as =, =
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|==|!=|\\|\\||&&|>=|<=|[\\^*/+-=()#<>!])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
-			lexedLine = CheckComment(lexedLine);
+			lexedLine = Parser.CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
 
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, vars);
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
-
-			int startIndex = tokenizedLine[i] is Statement ? 0 : Parser.GetTopElementIndex(tokenizedLine, 0, true);
-			Token tree = Parser.Parse(tokenizedLine, startIndex, 0);
+		
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), vars, lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();

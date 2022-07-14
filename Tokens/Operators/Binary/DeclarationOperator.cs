@@ -16,6 +16,11 @@ public class DeclarationOperator : BinaryOperator {
 	}
 	
 	public override Object Evaluate() {
+		try {
+			vars.Get(((VariableToken) Left).Name);
+			throw new InvalidOperationException(((VariableToken) Left).Name + " is already defined");
+		} catch (KeyNotFoundException) { }
+		
 		Object res = new Integer(0); // TODO: Make this default to null instead of 0
 		vars[((VariableToken) Left).Name] = res;
 

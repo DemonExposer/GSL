@@ -1,5 +1,4 @@
 using System.Text;
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 
