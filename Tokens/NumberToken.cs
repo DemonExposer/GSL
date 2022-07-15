@@ -1,12 +1,11 @@
 using System.Text;
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens; 
 
 public class NumberToken : Token {
-	public Integer Num;
+	public Integer Num = null!;
 
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -25,7 +24,5 @@ public class NumberToken : Token {
 		return Num;
 	}
 
-	public override int Size() {
-		return 1;
-	}
+	public override int Size() => 1;
 }

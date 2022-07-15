@@ -2,12 +2,19 @@ using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
+using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Tokens.Statements;
+using TrieDictionary;
+using Object = Interpreter.Types.Object;
 
 namespace Interpreter; 
 
 public class Parser {
 	public static int GetTopElementIndex(Token[] line, int startIndex, bool isRightBound) {
+		if (line[startIndex] is Statement)
+			return startIndex;
+		
 		int highestPriorityNum = -1;
 		int index = -1;
 		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
@@ -31,7 +38,7 @@ public class Parser {
 			} catch (KeyNotFoundException) { }
 			
 			if (!line[i].IsDone && line[i] is BinaryOperator && priority != -1) {
-				if (priority >= highestPriorityNum) {
+				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = i;
 				}
@@ -44,10 +51,18 @@ public class Parser {
 		return index;
 	}
 	
+	public static CheckedString[] CheckComment(CheckedString[] line) {
+		for (int i = 0; i < line.Length; i++)
+			if (line[i].Str == "#")
+				return line.Take(i).ToArray();
+
+		return line;
+	}
+	
 	/**
 	 * This now practically just parses everything, so maybe some refactoring is needed
 	 */
-	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, int depth, bool isRightBound) {
+	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
 		int j = GetTopElementIndex(line, i + (isRightBound ? 1 : -1), isRightBound);
 		if (j == i && !isRightBound) {
 			j = i - 1;
@@ -65,18 +80,18 @@ public class Parser {
 		// BinaryOperator does not exist or is already done
 		if (j < 0 || line[j].IsDone)
 			if (!isRightBound)
-				return Parse(line, j + 1, depth + 1);
+				return Parse(line, j + 1, vars, lines, ref lineNo, depth + 1);
 			else
-				return Parse(line, i + 1, depth + 1);
+				return Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 
 		// BinaryOperator does exist and is not done, parse it
-		return Parse(line, j, depth + 1);
+		return Parse(line, j, vars, lines, ref lineNo, depth + 1);
 	}
 
 	/**
 	 * Removes parentheses and parses inside expression by identifying the top operator and calling Parse
 	 */
-	private static Token ParenthesesParse(Token[] line, int i, int depth, bool isRightBound) {
+	private static Token ParenthesesParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
 		int startIndex = -1;
 		int highestPriorityNum = -1;
 		int index = -1;
@@ -141,10 +156,55 @@ public class Parser {
 		
 		// Parse the data in the brackets, where index is the index of the head of the tree in line, so index-i
 		// (i being the starting point of subLine in line) will be the index in subLine plus one
-		return Parse(subLine, index - startIndex, depth + 1);
+		return Parse(subLine, index - startIndex, vars, lines, ref lineNo, depth + 1);
+	}
+
+	/**
+	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
+	 */
+	private static MultiLineStatementOperator CurlyBracketsParse(string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
+		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
+		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
+		properVars.Add(new TrieDictionary<Object>());
+		
+		MultiLineStatementOperator mso = new MultiLineStatementOperator();
+		List<Token> tokens = new List<Token>();
+		int initialIndex = i++; // immediately increment i so that this function doesn't try to parse itself, but instead the next line
+		int numBrackets = 1;
+		for (; i < lines.Length; i++) {
+			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
+
+			lexedLine = CheckComment(lexedLine);
+			if (lexedLine.Length == 0)
+				continue;
+
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, properVars);
+
+			int before = i;
+			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), properVars, lines, ref i, depth + 1));
+
+			if (i != before)
+				continue;
+			
+			foreach (CheckedString cs in lexedLine)
+				if (cs.Str == "}")
+					numBrackets--;
+				else if (cs.Str == "{")
+					numBrackets++;
+
+			if (numBrackets == 0)
+				break;
+		}
+		
+		if (i >= lines.Length)
+			throw new FormatException("no matched bracket for bracket on line " + initialIndex);
+
+		mso.Children = tokens.ToArray();
+
+		return mso;
 	}
 	
-	public static Token Parse(Token[] line, int i, int depth) {
+	public static Token Parse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth) {
 		Token t = line[i];
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
@@ -152,29 +212,49 @@ public class Parser {
 			line[i].IsDone = true;
 
 			// Parse only the appropriate section (i.e. Left should only parse to the left and Right only to the right, that's what the array slicing does)
-			((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, depth + 1, false);
-			((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, depth + 1, true);
+			((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, vars, lines, ref lineNo, depth + 1, false);
+			((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, vars, lines, ref lineNo, depth + 1, true);
 		} else if (t is DeclarationOperator decOp) {
-			decOp.SetVars(Program.vars);
-			decOp.Left = Parse(line, i + 1, depth+1);
+			decOp.SetVars(vars);
+			decOp.Left = Parse(line, i + 1, vars, lines, ref lineNo, depth+1);
 			
 			if (i + 2 < line.Length) // Only Parse right hand side if it exists
-				decOp.Right = Parse(line, i + 2, depth + 1);
+				decOp.Right = Parse(line, i + 2, vars, lines, ref lineNo, depth + 1);
 		} else if (t is AssignmentOperator assOp) {
 			assOp.IsDone = true;
 			
-			assOp.SetVars(Program.vars);
-			assOp.Left = Parse(line, i - 1, depth+1);
-			assOp.Right = Parse(line, GetTopElementIndex(line, i+1, true), depth+1);
+			assOp.SetVars(vars);
+			assOp.Left = Parse(line, i - 1, vars, lines, ref lineNo, depth+1);
+			Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
+			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), vars, lines, ref lineNo, depth+1);
 		} else if (t is ParenthesesOperator parOp) {
-			parOp.Child = ParenthesesParse(line, i, depth + 1, line[i].Str == "(");
+			parOp.Child = ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
-			minUnOp.Child = Parse(line, i + 1, depth + 1);
+			minUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is NotUnaryOperator notUnOp) {
-			notUnOp.Child = Parse(line, i + 1, depth + 1);
+			notUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
-				vt.Args = Parse(line, i + 1, depth + 1);
+				vt.Args = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
+		} else if (t is OnStatement onS) {
+			Token left = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
+			if (left is not ParenthesesOperator po)
+				throw new FormatException("if statement condition on line " + left.Line + " is missing parentheses");
+			
+			onS.Left = po;
+			
+			int numBrackets = 0;
+			int j = i+1;
+			do {
+				if (line[j].Str == ")")
+					numBrackets--;
+				else if (line[j].Str == "(")
+					numBrackets++;
+				
+				j++;
+			} while (numBrackets != 0);
+			
+			onS.Right = CurlyBracketsParse(lines, ref lineNo, vars, depth + 1);
 		}
 
 		t.Line = line[i].Line;

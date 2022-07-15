@@ -4,41 +4,40 @@ using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Tokens.Statements;
 using Interpreter.Types.Function;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
+using System.Text.RegularExpressions;
+using Interpreter.Tokens.Operators.N_Ary;
 
 namespace Interpreter;
 
-using System.Text.RegularExpressions;
-
 public class Program {
 	public static TrieDictionary<Type> bindings = new ();
-	public static TrieDictionary<Object> vars = new ();
+	private static TrieDictionary<Object> vars = new ();
 	public static TrieDictionary<int> priorities = new ();
 
-	private static CheckedString[] CheckComment(CheckedString[] line) {
-		for (int i = 0; i < line.Length; i++)
-			if (line[i].Str == "#")
-				return line.Take(i).ToArray();
-
-		return line;
-	}
-
 	public static void Main(string[] args) {
+		// Arithmetic
 		bindings.Insert("+", typeof(PlusBinaryOperator));
 		bindings.Insert("-", typeof(MinusBinaryOperator));
 		bindings.Insert("*", typeof(MultiplicationBinaryOperator));
 		bindings.Insert("/", typeof(DivisionBinaryOperator));
 		bindings.Insert("^", typeof(PowerBinaryOperator));
 		
+		// Variable initialization
 		bindings.Insert("decl", typeof(DeclarationOperator));
 		bindings.Insert("=", typeof(AssignmentOperator));
 		
+		// Brackets
 		bindings.Insert("(", typeof(ParenthesesOperator));
 		bindings.Insert(")", typeof(ParenthesesOperator));
+		bindings.Insert("{", typeof(MultiLineStatementOperator));
+		bindings.Insert("}", typeof(MultiLineStatementOperator));
 		
+		// Boolean logic
 		bindings.Insert("&&", typeof(AndBinaryOperator));
 		bindings.Insert("and", typeof(AndBinaryOperator));
 		bindings.Insert("||", typeof(OrBinaryOperator));
@@ -50,6 +49,9 @@ public class Program {
 		bindings.Insert("<=", typeof(SmallerEqualBinaryOperator));
 		bindings.Insert(">=", typeof(LargerEqualBinaryOperator));
 		bindings.Insert("!", typeof(NotUnaryOperator));
+		
+		// Statements
+		bindings.Insert("on", typeof(OnStatement));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
@@ -80,23 +82,22 @@ public class Program {
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
-			// Regex matching all valid strings, with the least complicated in the back so that e.g. == gets matched as == and not as =, =
-			CheckedString[] lexedLine = Regex.Matches(lines[i], "([a-zA-Z0-9]+|==|!=|\\|\\||&&|>=|<=|[\\^*/+-=()#<>!])").ToList().Select(match => new CheckedString {Str = match.Value.Trim(), Line = i+1}).ToArray();
+			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
-			lexedLine = CheckComment(lexedLine);
+			lexedLine = Parser.CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
-
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+			
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, new [] {vars}.ToList());
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
-
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), 0);
+		
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();

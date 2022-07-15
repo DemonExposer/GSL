@@ -2,13 +2,14 @@ using System.Data;
 using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Unary;
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
+using TrieDictionary;
+using Object = Interpreter.Types.Object;
 
 namespace Interpreter; 
 
 public class Tokenizer {
-	public static Token[] Tokenize(CheckedString[] line) {
+	public static Token[] Tokenize(CheckedString[] line, List<TrieDictionary<Object>> vars) {
 		Token[] res = new Token[line.Length];
 		
 		for (int i = 0; i < line.Length; i++) {
@@ -33,7 +34,7 @@ public class Tokenizer {
 			if (tokenType != null!) { // Check if string is a keyword/operator
 				res[i] = (Token) Activator.CreateInstance(tokenType)!; // Instantiate the corresponding class
 			} else if (Regex.Matches(line[i].Str, "^[a-zA-Z]\\w*$").Count == 1) {
-				VariableToken vt = new VariableToken(Program.vars);
+				VariableToken vt = new VariableToken(vars);
 				vt.Name = line[i].Str;
 				res[i] = vt;
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {

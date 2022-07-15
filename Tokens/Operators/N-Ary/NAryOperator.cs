@@ -1,10 +1,10 @@
 using System.Text;
 
-namespace Interpreter.Tokens.Operators.Unary; 
+namespace Interpreter.Tokens.Operators.N_Ary; 
 
-public abstract class UnaryOperator : Token {
+public abstract class NAryOperator : Token {
 	public string Symbol = null!;
-	public Token Child = null!;
+	public Token[] Children = new Token[0];
 	
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -15,11 +15,11 @@ public abstract class UnaryOperator : Token {
 		string indentStr = indentSb.ToString();
 		
 		sb.Append(indentStr).Append(Symbol).Append('\n');
-		if (Child != null!)
-			sb.Append(Child.ToString(indent + 1));
+		foreach (Token t in Children)
+			sb.Append(t.ToString(indent + 1));
 
 		return sb.ToString();
 	}
-	
-	public override int Size() => 1 + Child.Size();
+
+	public override int Size() => 1 + Children.Sum(t => t.Size());
 }

@@ -8,7 +8,5 @@ public class NotUnaryOperator : UnaryOperator {
 		Symbol = "!";
 	}
 	
-	public override Object Evaluate() {
-		return new Boolean(!((Boolean) Child.Evaluate()).Bool);
-	}
+	public override Object Evaluate() => new Boolean(!((Boolean) Child.Evaluate()).Bool);
 }

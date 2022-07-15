@@ -1,4 +1,3 @@
-using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 
@@ -9,7 +8,5 @@ public class PowerBinaryOperator : ArithmeticOperator {
 		Symbol = "^";
 	}
 	
-	public override Object Evaluate() {
-		return new Integer((int) Math.Pow(((Integer) Left.Evaluate()).Int, ((Integer) Right.Evaluate()).Int));
-	}
+	public override Object Evaluate() => new Integer((int) Math.Pow(((Integer) Left.Evaluate()).Int, ((Integer) Right.Evaluate()).Int));
 }

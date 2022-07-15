@@ -3,7 +3,7 @@ using TrieDictionary;
 namespace Interpreter.Types.Function; 
 
 public class Function : Object {
-	private TrieDictionary<Object> vars;
+	private TrieDictionary<Object> vars = null!;
 	public FunctionArgument[] Args;
 	private FunctionBody body;
 
@@ -29,12 +29,8 @@ public class Function : Object {
 		return body.Execute(args, vars);
 	}
 
-	public override string ToString() {
-		return "Function";
-	}
+	public override string ToString() => "Function";
 
-	public override string GetType() {
-		return "Function";
-	}
+	public override string GetType() => "Function";
 }
 
