@@ -66,7 +66,6 @@ public class Parser {
 		int startIndex = i + (isRightBound ? 1 : -1);
 		int j = GetTopElementIndex(line, startIndex, isRightBound);
 		if (j == startIndex && !isRightBound) {
-			j = startIndex;
 			int numBrackets = 0;
 			while (numBrackets != 0 || j >= 0 && line[j] is not BinaryOperator) {
 				if (line[j].Str == "(")
