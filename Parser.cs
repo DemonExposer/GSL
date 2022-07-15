@@ -63,9 +63,10 @@ public class Parser {
 	 * This now practically just parses everything, so maybe some refactoring is needed
 	 */
 	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
-		int j = GetTopElementIndex(line, i + (isRightBound ? 1 : -1), isRightBound);
-		if (j == i && !isRightBound) {
-			j = i - 1;
+		int startIndex = i + (isRightBound ? 1 : -1);
+		int j = GetTopElementIndex(line, startIndex, isRightBound);
+		if (j == startIndex && !isRightBound) {
+			j = startIndex;
 			int numBrackets = 0;
 			while (numBrackets != 0 || j >= 0 && line[j] is not BinaryOperator) {
 				if (line[j].Str == "(")
@@ -131,7 +132,7 @@ public class Parser {
 			}
 
 			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
-			// This should really go through GetTopElementIndex, but that would need an adaptation for leftbound cases
+			// This should really go through GetTopElementIndex
 			int priority = -1;
 			try {
 				priority = Program.priorities[line[j].Str];

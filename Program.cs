@@ -25,6 +25,7 @@ public class Program {
 		bindings.Insert("-", typeof(MinusBinaryOperator));
 		bindings.Insert("*", typeof(MultiplicationBinaryOperator));
 		bindings.Insert("/", typeof(DivisionBinaryOperator));
+		bindings.Insert("%", typeof(ModulusBinaryOperator));
 		bindings.Insert("^", typeof(PowerBinaryOperator));
 		
 		// Variable initialization
@@ -69,6 +70,7 @@ public class Program {
 		priorities.Insert("^", 6);
 		priorities.Insert("*", 7);
 		priorities.Insert("/", 7);
+		priorities.Insert("%", 7);
 		priorities.Insert("+", 8);
 		priorities.Insert("-", 8);
 		priorities.Insert("=", 9);
