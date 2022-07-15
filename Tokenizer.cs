@@ -9,7 +9,7 @@ using Object = Interpreter.Types.Object;
 namespace Interpreter; 
 
 public class Tokenizer {
-	public static Token[] Tokenize(CheckedString[] line, TrieDictionary<Object> vars) {
+	public static Token[] Tokenize(CheckedString[] line, List<TrieDictionary<Object>> vars) {
 		Token[] res = new Token[line.Length];
 		
 		for (int i = 0; i < line.Length; i++) {

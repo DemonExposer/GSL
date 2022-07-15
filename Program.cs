@@ -89,15 +89,15 @@ public class Program {
 			lexedLine = Parser.CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
-
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, vars);
+			
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, new [] {vars}.ToList());
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 		
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), vars, lines, ref i, 0);
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate();

@@ -62,7 +62,7 @@ public class Parser {
 	/**
 	 * This now practically just parses everything, so maybe some refactoring is needed
 	 */
-	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, TrieDictionary<Object> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
 		int j = GetTopElementIndex(line, i + (isRightBound ? 1 : -1), isRightBound);
 		if (j == i && !isRightBound) {
 			j = i - 1;
@@ -91,7 +91,7 @@ public class Parser {
 	/**
 	 * Removes parentheses and parses inside expression by identifying the top operator and calling Parse
 	 */
-	private static Token ParenthesesParse(Token[] line, int i, TrieDictionary<Object> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+	private static Token ParenthesesParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
 		int startIndex = -1;
 		int highestPriorityNum = -1;
 		int index = -1;
@@ -162,12 +162,11 @@ public class Parser {
 	/**
 	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
 	 */
-	public static MultiLineStatementOperator CurlyBracketsParse(string[] lines, ref int i, TrieDictionary<Object> vars, int depth) {
-		// TODO: fix scopes
-		TrieDictionary<Object> properVars = new TrieDictionary<Object>();
-		foreach (string s in vars.GetKeySet())
-			properVars.Insert(s, vars[s]);
-
+	private static MultiLineStatementOperator CurlyBracketsParse(string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
+		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
+		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
+		properVars.Add(new TrieDictionary<Object>());
+		
 		MultiLineStatementOperator mso = new MultiLineStatementOperator();
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i++; // immediately increment i so that this function doesn't try to parse itself, but instead the next line
@@ -205,7 +204,7 @@ public class Parser {
 		return mso;
 	}
 	
-	public static Token Parse(Token[] line, int i, TrieDictionary<Object> vars, string[] lines, ref int lineNo, int depth) {
+	public static Token Parse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth) {
 		Token t = line[i];
 
 		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
