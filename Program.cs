@@ -9,7 +9,6 @@ using Interpreter.Types.Function;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
-using System.Text.RegularExpressions;
 using Interpreter.Tokens.Operators.N_Ary;
 
 namespace Interpreter;
@@ -53,6 +52,7 @@ public class Program {
 		
 		// Statements
 		bindings.Insert("on", typeof(OnStatement));
+		bindings.Insert("while", typeof(WhileLoop));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
