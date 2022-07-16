@@ -228,7 +228,7 @@ public class Parser {
 			Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
 			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), vars, lines, ref lineNo, depth+1);
 		} else if (t is ParenthesesOperator parOp) {
-			parOp.Child = ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(");
+			parOp.Children = new [] {ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(")};
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is NotUnaryOperator notUnOp) {

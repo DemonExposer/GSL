@@ -1,5 +1,6 @@
 using System.Text;
 using Interpreter.Types.Function;
+using Interpreter.Types.Util;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 
@@ -41,9 +42,11 @@ public class VariableToken : Token {
 		if (res == null!)
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
 
-		if (res is Function f)
-			return f.Execute(new [] {Args.Evaluate()});
-		
+		if (res is Function f) {
+			Object o = Args.Evaluate();
+			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o});
+		}
+
 		return res;
 	}
 
