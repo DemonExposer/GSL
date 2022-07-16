@@ -1,5 +1,3 @@
 /bin/
 /.idea/
-/obj/project.packagespec.json
-/obj/rider.project.restore.info
-/obj/Debug/
+/obj/
