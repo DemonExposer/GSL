@@ -57,23 +57,23 @@ public class Program {
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
 		priorities.Insert("!", 1);
-		priorities.Insert(">", 2);
-		priorities.Insert("<", 2);
-		priorities.Insert("<=", 2);
-		priorities.Insert(">=", 2);
-		priorities.Insert("==", 3);
-		priorities.Insert("!=", 3);
-		priorities.Insert("&&", 4);
-		priorities.Insert("and", 4);
-		priorities.Insert("||", 5);
-		priorities.Insert("or", 5);
-		priorities.Insert("^", 6);
-		priorities.Insert("*", 7);
-		priorities.Insert("/", 7);
-		priorities.Insert("%", 7);
-		priorities.Insert("+", 8);
-		priorities.Insert("-", 8);
-		priorities.Insert("=", 9);
+		priorities.Insert("^", 2);
+		priorities.Insert("*", 3);
+		priorities.Insert("/", 3);
+		priorities.Insert("%", 3);
+		priorities.Insert("+", 4);
+		priorities.Insert("-", 4);
+		priorities.Insert("=", 5);
+		priorities.Insert(">", 6);
+		priorities.Insert("<", 6);
+		priorities.Insert("<=", 6);
+		priorities.Insert(">=", 6);
+		priorities.Insert("==", 7);
+		priorities.Insert("!=", 7);
+		priorities.Insert("&&", 8);
+		priorities.Insert("and", 8);
+		priorities.Insert("||", 9);
+		priorities.Insert("or", 9);
 		priorities.Insert("decl", 10);
 		
 		// Standard defined variables
