@@ -1,12 +1,13 @@
 using Interpreter.Tokens;
+using Interpreter.Tokens.Operators.N_Ary;
 using TrieDictionary;
 
 namespace Interpreter.Types.Function; 
 
 public class FunctionBody {
-	private Token[] expressions;
+	private MultilineStatementOperator expressions;
 
-	public FunctionBody(Token[] expressions) {
+	public FunctionBody(MultilineStatementOperator expressions) {
 		this.expressions = expressions;
 	}
 

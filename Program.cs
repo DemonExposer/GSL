@@ -34,8 +34,8 @@ public class Program {
 		// Brackets
 		bindings.Insert("(", typeof(ParenthesesOperator));
 		bindings.Insert(")", typeof(ParenthesesOperator));
-		bindings.Insert("{", typeof(MultiLineStatementOperator));
-		bindings.Insert("}", typeof(MultiLineStatementOperator));
+		bindings.Insert("{", typeof(MultilineStatementOperator));
+		bindings.Insert("}", typeof(MultilineStatementOperator));
 		
 		// Boolean logic
 		bindings.Insert("&&", typeof(AndBinaryOperator));

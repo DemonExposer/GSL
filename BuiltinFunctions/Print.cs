@@ -1,5 +1,5 @@
 using System.Text;
-using Interpreter.Tokens;
+using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types.Function;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
@@ -7,7 +7,7 @@ using TrieDictionary;
 namespace Interpreter.BuiltinFunctions; 
 
 public class Print : FunctionBody {
-	public Print(Token[] expressions) : base(expressions) { }
+	public Print(MultilineStatementOperator expressions) : base(expressions) { }
 
 	public override Object Execute(Object[] args, TrieDictionary<Object> vars) {
 		StringBuilder sb = new StringBuilder();

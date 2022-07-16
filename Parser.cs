@@ -162,12 +162,12 @@ public class Parser {
 	/**
 	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
 	 */
-	private static MultiLineStatementOperator CurlyBracketsParse(string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
 		properVars.Add(new TrieDictionary<Object>());
 		
-		MultiLineStatementOperator mso = new MultiLineStatementOperator();
+		MultilineStatementOperator mso = new MultilineStatementOperator();
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i++; // immediately increment i so that this function doesn't try to parse itself, but instead the next line
 		int numBrackets = 1;
