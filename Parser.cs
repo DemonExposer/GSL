@@ -236,12 +236,12 @@ public class Parser {
 		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
-		} else if (t is OnStatement onS) {
+		} else if (t is Statement statement) {
 			Token left = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 			if (left is not ParenthesesOperator po)
-				throw new FormatException("if statement condition on line " + left.Line + " is missing parentheses");
+				throw new FormatException("statement condition on line " + left.Line + " is missing parentheses");
 			
-			onS.Left = po;
+			statement.Left = po;
 			
 			int numBrackets = 0;
 			int j = i+1;
@@ -254,7 +254,7 @@ public class Parser {
 				j++;
 			} while (numBrackets != 0);
 			
-			onS.Right = CurlyBracketsParse(lines, ref lineNo, vars, depth + 1);
+			statement.Right = CurlyBracketsParse(lines, ref lineNo, vars, depth + 1);
 		}
 
 		t.Line = line[i].Line;
