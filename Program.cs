@@ -10,6 +10,7 @@ using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 using Interpreter.Tokens.Operators.N_Ary;
+using Interpreter.Tokens.Separators;
 
 namespace Interpreter;
 
@@ -53,6 +54,9 @@ public class Program {
 		// Statements
 		bindings.Insert("on", typeof(OnStatement));
 		bindings.Insert("while", typeof(WhileLoop));
+		
+		// Separators
+		bindings.Insert(",", typeof(CommaSeparator));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
@@ -94,15 +98,15 @@ public class Program {
 			
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, new [] {vars}.ToList());
 
-		//	Console.Write("[");
-		//	foreach (Token t in tokenizedLine)
-		//		Console.Write("{0}, ", t.GetType());
-		//	Console.WriteLine("]");
+			Console.Write("[");
+			foreach (Token t in tokenizedLine)
+				Console.Write("{0}, ", t.GetType());
+			Console.WriteLine("]");
 		
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
 
-		//	Console.WriteLine(tree.ToString(0));
-			tree.Evaluate();
+			Console.WriteLine(tree.ToString(0));
+		//	tree.Evaluate();
 		}
 	}
 }

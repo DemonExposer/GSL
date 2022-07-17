@@ -4,6 +4,7 @@ using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Operators.Unary;
+using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
@@ -91,72 +92,44 @@ public class Parser {
 	/**
 	 * Removes parentheses and parses inside expression by identifying the top operator and calling Parse
 	 */
-	private static Token ParenthesesParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
-		int startIndex = -1;
-		int highestPriorityNum = -1;
-		int index = -1;
-		Token[] subLine = {};
-		int numBrackets = 1;
-		for (int j = i + (isRightBound ? 1 : -1); numBrackets > 0; j += isRightBound ? 1 : -1) {
-			// Go until paired bracket is found
-			if (line[j].Str == ")")
-				numBrackets += isRightBound ? -1 : 1;
-			else if (line[j].Str == "(")
-				numBrackets += isRightBound ? 1 : -1;
-
-			if (numBrackets == 0)
-				break;
-
-			// If there is a nested set of brackets, add that entire set immediately, because otherwise something goes wrong
-			if (isRightBound ? line[j].Str == "(" : line[j].Str == ")") {
-				while (numBrackets > 1) {
-					if (isRightBound && subLine.Length == 0)
-						startIndex = j;
-					subLine = isRightBound ? subLine.Append(line[j]).ToArray() : subLine.Prepend(line[j]).ToArray();
-					j += isRightBound ? 1 : -1;
-					if (line[j].Str == "(")
-						numBrackets += isRightBound ? 1 : -1;
-					else if (line[j].Str == ")")
-						numBrackets += isRightBound ? -1 : 1;
-				}
-			}
-
-			if (isRightBound) {
-				if (subLine.Length == 0)
-					startIndex = j;
-				subLine = subLine.Append(line[j]).ToArray();
-			} else {
-				startIndex = j;
-				subLine = subLine.Prepend(line[j]).ToArray();
-			}
-
-			// Get the index of the operator with the lowest priority (highest number) to make sure that gets parsed first
-			// This should really go through GetTopElementIndex
-			int priority = -1;
-			try {
-				priority = Program.priorities[line[j].Str];
-			} catch (KeyNotFoundException) { }
+	private static Token[] ParenthesesParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+		// TODO: Make this accept leftbound cases as well
+		List<Token[]> arguments = new List<Token[]>();
+		List<Token> subLine = new List<Token>();
+		int numBrackets = 0;
+		for (int j = i+1; j < line.Length-1; j++) {
+			if (line[j].Str == "(")
+				numBrackets++;
+			else if (line[j].Str == ")")
+				numBrackets--;
 			
-			if (line[j] is BinaryOperator && priority != -1) {
-				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
-					highestPriorityNum = priority;
-					index = j;
-				}
-			}
-		}
-		
-		if (index == -1)
-			index = startIndex; // This makes sure index-startIndex is 0, because the first and only element should be parsed
+			while (numBrackets != 0) {
+				if (line[j].Str == "(")
+					numBrackets++;
+				else if (line[j].Str == ")")
+					numBrackets--;
 
-		if (startIndex == -1) {
-			Console.ForegroundColor = ConsoleColor.Red;
-			Console.WriteLine("Error in bracket parsing");
-			Console.ResetColor();
+				j++;
+			}
+
+			// When a comma is found, add the current buffer as an argument and start on a new argument
+			if (line[j] is CommaSeparator) {
+				arguments.Add(subLine.ToArray());
+				subLine = new List<Token>();
+				continue;
+			}
+
+			subLine.Add(line[j]);
 		}
 		
-		// Parse the data in the brackets, where index is the index of the head of the tree in line, so index-i
-		// (i being the starting point of subLine in line) will be the index in subLine plus one
-		return Parse(subLine, index - startIndex, vars, lines, ref lineNo, depth + 1);
+		arguments.Add(subLine.ToArray());
+
+		// Parse each element in the brackets and put it in a new list
+		List<Token> properArguments = new List<Token>();
+		for (int j = 0; j < arguments.Count; j++)
+			properArguments.Add(Parse(arguments[j], GetTopElementIndex(arguments[j].ToArray(), 0, true), vars, lines, ref lineNo, depth + 1));
+		
+		return properArguments.ToArray();
 	}
 
 	/**
@@ -228,7 +201,7 @@ public class Parser {
 			Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
 			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), vars, lines, ref lineNo, depth+1);
 		} else if (t is ParenthesesOperator parOp) {
-			parOp.Children = new [] {ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(")};
+			parOp.Children = ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(");
 		} else if (t is MinusUnaryOperator minUnOp) {
 			minUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is NotUnaryOperator notUnOp) {
