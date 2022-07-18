@@ -97,7 +97,7 @@ public class Parser {
 		List<Token[]> arguments = new List<Token[]>();
 		List<Token> subLine = new List<Token>();
 		int numBrackets = 0;
-		for (int j = i+1; j < line.Length-1; j++) {
+		for (int j = i+1; line[j].Str != ")"; j++) {
 			if (line[j].Str == "(")
 				numBrackets++;
 			else if (line[j].Str == ")")
@@ -135,12 +135,11 @@ public class Parser {
 	/**
 	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
 	 */
-	private static MultilineStatementOperator CurlyBracketsParse(string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
 		properVars.Add(new TrieDictionary<Object>());
 		
-		MultilineStatementOperator mso = new MultilineStatementOperator();
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i++; // immediately increment i so that this function doesn't try to parse itself, but instead the next line
 		int numBrackets = 1;
@@ -172,9 +171,9 @@ public class Parser {
 		if (i >= lines.Length)
 			throw new FormatException("no matched bracket for bracket on line " + initialIndex);
 
-		mso.Children = tokens.ToArray();
+		((MultilineStatementOperator) line[^1]).Children = tokens.ToArray();
 
-		return mso;
+		return (MultilineStatementOperator) line[^1];
 	}
 	
 	public static Token Parse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth) {
@@ -210,9 +209,14 @@ public class Parser {
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is Statement statement) {
-			Token left = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
+			int addition = 1;
+			if (t is FunctionStatement fs) {
+				addition = 2;
+				fs.Name = line[i + 1].Str;
+			}
+			Token left = Parse(line, i + addition, vars, lines, ref lineNo, depth + 1);
 			if (left is not ParenthesesOperator po)
-				throw new FormatException("statement condition on line " + left.Line + " is missing parentheses");
+				throw new FormatException("statement condition/parameter declaration on line " + left.Line + " is missing parentheses");
 			
 			statement.Left = po;
 			
@@ -227,7 +231,8 @@ public class Parser {
 				j++;
 			} while (numBrackets != 0);
 			
-			statement.Right = CurlyBracketsParse(lines, ref lineNo, vars, depth + 1);
+			
+			statement.Right = CurlyBracketsParse(line, lines, ref lineNo, vars, depth + 1);
 		}
 
 		t.Line = line[i].Line;

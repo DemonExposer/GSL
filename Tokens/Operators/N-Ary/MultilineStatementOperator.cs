@@ -1,8 +1,11 @@
+using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Operators.N_Ary; 
 
 public class MultilineStatementOperator : NAryOperator {
+	public List<TrieDictionary<Object>> Vars = null!;
+
 	public MultilineStatementOperator() {
 		Symbol = "{}";
 	}
