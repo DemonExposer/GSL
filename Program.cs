@@ -105,8 +105,8 @@ public class Program {
 		
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
 
-			Console.WriteLine(tree.ToString(0));
-		//	tree.Evaluate();
+		//	Console.WriteLine(tree.ToString(0));
+			tree.Evaluate();
 		}
 	}
 }
