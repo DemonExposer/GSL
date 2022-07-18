@@ -15,7 +15,7 @@ public class Parser {
 	public static int GetTopElementIndex(Token[] line, int startIndex, bool isRightBound) {
 		if (line[startIndex] is Statement)
 			return startIndex;
-		
+	
 		int highestPriorityNum = -1;
 		int index = -1;
 		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
@@ -90,44 +90,58 @@ public class Parser {
 	}
 
 	/**
-	 * Removes parentheses and parses inside expression by identifying the top operator and calling Parse
+	 * Removes parentheses and parses inside expression(s) by identifying the top operator and calling Parse
 	 */
 	private static Token[] ParenthesesParse(Token[] line, int i, List<TrieDictionary<Object>> vars, string[] lines, ref int lineNo, int depth, bool isRightBound) {
-		// TODO: Make this accept leftbound cases as well
 		List<Token[]> arguments = new List<Token[]>();
 		List<Token> subLine = new List<Token>();
 		int numBrackets = 0;
-		for (int j = i+1; line[j].Str != ")"; j++) {
+		for (int j = i + (isRightBound ? 1 : -1); line[j].Str != (isRightBound ? ")" : "("); j += isRightBound ? 1 : -1) {
 			if (line[j].Str == "(")
 				numBrackets++;
 			else if (line[j].Str == ")")
 				numBrackets--;
 			
 			while (numBrackets != 0) {
+				if (isRightBound)
+					subLine.Add(line[j]);
+				else
+					subLine = subLine.Prepend(line[j]).ToList();
+				
+				j += isRightBound ? 1 : -1;
+				
 				if (line[j].Str == "(")
 					numBrackets++;
 				else if (line[j].Str == ")")
 					numBrackets--;
-
-				j++;
 			}
 
 			// When a comma is found, add the current buffer as an argument and start on a new argument
 			if (line[j] is CommaSeparator) {
-				arguments.Add(subLine.ToArray());
+				if (isRightBound)
+					arguments.Add(subLine.ToArray());
+				else
+					arguments = arguments.Prepend(subLine.ToArray()).ToList();
 				subLine = new List<Token>();
 				continue;
 			}
 
-			subLine.Add(line[j]);
+			if (isRightBound)
+				subLine.Add(line[j]);
+			else
+				subLine = subLine.Prepend(line[j]).ToList();
 		}
-		
-		arguments.Add(subLine.ToArray());
 
+		if (subLine.Count > 0)
+			if (isRightBound)
+				arguments.Add(subLine.ToArray());
+			else
+				arguments = arguments.Prepend(subLine.ToArray()).ToList();
+		
 		// Parse each element in the brackets and put it in a new list
 		List<Token> properArguments = new List<Token>();
 		for (int j = 0; j < arguments.Count; j++)
-			properArguments.Add(Parse(arguments[j], GetTopElementIndex(arguments[j].ToArray(), 0, true), vars, lines, ref lineNo, depth + 1));
+			properArguments.Add(Parse(arguments[j], GetTopElementIndex(arguments[j].ToArray(), 0, isRightBound), vars, lines, ref lineNo, depth + 1));
 		
 		return properArguments.ToArray();
 	}
@@ -205,7 +219,7 @@ public class Parser {
 			minUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is NotUnaryOperator notUnOp) {
 			notUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
-		} else if (t is VariableToken vt) { // TODO: make sure multiple arguments get parsed properly
+		} else if (t is VariableToken vt) {
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is Statement statement) {

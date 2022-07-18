@@ -14,6 +14,9 @@ public class Function : Object {
 
 	public Object Execute(Object[] args) {
 		vars = new TrieDictionary<Object>();
+
+		if (args.Length == 0 && Args.Length == 0)
+			return body.Execute(args, vars);
 		
 		if (!Args[^1].IsUnlimited && args.Length != Args.Length)
 			throw new InvalidOperationException("Args incorrect length: is: " + args.Length + ", should be: " +
