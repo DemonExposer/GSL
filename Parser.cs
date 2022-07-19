@@ -152,6 +152,8 @@ public class Parser {
 	 */
 	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, List<TrieDictionary<Object>> vars, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
+		// BUG: this copying leads to recursive calls not working properly, as a new scope cannot be added to the list,
+		// BUG: because the list in FunctionBody is a different list from the one in VariableToken
 		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
 		properVars.Add(new TrieDictionary<Object>());
 		

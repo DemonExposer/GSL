@@ -11,7 +11,8 @@ public class FunctionBody {
 	}
 
 	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars) {
-		vars.GetKeySet().ToList().ForEach(key => expressions.Vars[^1].Insert(key, vars[key]));
+		expressions.Vars.Add(vars);
+		Console.WriteLine(expressions.Vars[^1].GetKeySet()[0]);
 		
 		return expressions.Evaluate();
 	}
