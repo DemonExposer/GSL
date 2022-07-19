@@ -4,12 +4,14 @@ using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
-using Interpreter.Tokens.Statements;
 using Interpreter.Types.Function;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 using Interpreter.Tokens.Operators.N_Ary;
+using Interpreter.Tokens.Separators;
+using Interpreter.Tokens.Statements.Binary;
+using Interpreter.Tokens.Statements.Unary;
 
 namespace Interpreter;
 
@@ -34,8 +36,8 @@ public class Program {
 		// Brackets
 		bindings.Insert("(", typeof(ParenthesesOperator));
 		bindings.Insert(")", typeof(ParenthesesOperator));
-		bindings.Insert("{", typeof(MultiLineStatementOperator));
-		bindings.Insert("}", typeof(MultiLineStatementOperator));
+		bindings.Insert("{", typeof(MultilineStatementOperator));
+		bindings.Insert("}", typeof(MultilineStatementOperator));
 		
 		// Boolean logic
 		bindings.Insert("&&", typeof(AndBinaryOperator));
@@ -53,6 +55,11 @@ public class Program {
 		// Statements
 		bindings.Insert("on", typeof(OnStatement));
 		bindings.Insert("while", typeof(WhileLoop));
+		bindings.Insert("function", typeof(FunctionStatement));
+		bindings.Insert("return", typeof(ReturnStatement));
+		
+		// Separators
+		bindings.Insert(",", typeof(CommaSeparator));
 
 		// Low number for priority means a higher priority
 		priorities.Insert("(", 0);
@@ -92,17 +99,17 @@ public class Program {
 			if (lexedLine.Length == 0)
 				continue;
 			
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, new [] {vars}.ToList());
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 		
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
-			tree.Evaluate();
+			tree.Evaluate(new List<TrieDictionary<Object>> {vars});
 		}
 	}
 }

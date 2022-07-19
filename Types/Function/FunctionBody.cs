@@ -1,16 +1,16 @@
-using Interpreter.Tokens;
+using Interpreter.Tokens.Operators.N_Ary;
 using TrieDictionary;
 
 namespace Interpreter.Types.Function; 
 
 public class FunctionBody {
-	private Token[] expressions;
+	public MultilineStatementOperator expressions = null!;
 
-	public FunctionBody(Token[] expressions) {
+	public FunctionBody(MultilineStatementOperator expressions) {
 		this.expressions = expressions;
+		if (this.expressions != null!)
+			this.expressions.IsPartOfFunction = true;
 	}
 
-	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars) {
-		throw new NotImplementedException();
-	}
+	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) => expressions.Evaluate(new List<TrieDictionary<Object>> {topScopeVars[0], vars});
 }

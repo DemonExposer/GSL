@@ -1,3 +1,4 @@
+using TrieDictionary;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 
@@ -8,5 +9,5 @@ public class NotUnaryOperator : UnaryOperator {
 		Symbol = "!";
 	}
 	
-	public override Object Evaluate() => new Boolean(!((Boolean) Child.Evaluate()).Bool);
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Boolean(!((Boolean) Child.Evaluate(vars)).Bool);
 }

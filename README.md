@@ -2,6 +2,16 @@
 <img src="img/logo.png" width=200 align="right" />
 This repository contains the official interpreter for GSL (General Scripting Language).<br/>
 
+### Installation
+#### Prerequisites
+- dotnet SDK
+
+#### Dependencies
+Run `dotnet restore` in the project directory to install the dependencies.
+
+#### Execution
+Run `dotnet run <input file>` to build the project and run your input file. Of course, `<input file>` should be replaced with the name of the GSL file you want to run.
+
 ### Simplicity with understanding
 GSL is designed as a simple language, which is supposed to make complicated tasks easier without losing the knowledge of what the programmer is doing.<br/>
 

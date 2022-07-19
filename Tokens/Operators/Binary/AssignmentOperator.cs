@@ -4,17 +4,11 @@ using TrieDictionary;
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class AssignmentOperator : BinaryOperator {
-	private List<TrieDictionary<Object>> vars = null!;
-	
 	public AssignmentOperator() {
 		Symbol = "=";
 	}
 	
-	public void SetVars(List<TrieDictionary<Object>> vars) {
-		this.vars = vars;
-	}
-	
-	public override Object Evaluate() {
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		Object leftCheck = null!;
 		int scopeIndex;
 		for (scopeIndex = vars.Count - 1; scopeIndex >= 0; scopeIndex--) try {
@@ -25,8 +19,7 @@ public class AssignmentOperator : BinaryOperator {
 		if (leftCheck == null!)
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + ((VariableToken) Left).Name + " does not exist");
 
-		Object res = Right.Evaluate();
-		vars[scopeIndex].Remove(((VariableToken) Left).Name);
+		Object res = Right.Evaluate(vars);
 		vars[scopeIndex][((VariableToken) Left).Name] = res;
 		
 		return res;
