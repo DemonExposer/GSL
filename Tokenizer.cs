@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Operators.Unary;
-using Interpreter.Tokens.Statements;
+using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Types.Comparable;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;

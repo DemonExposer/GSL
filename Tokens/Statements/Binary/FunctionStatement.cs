@@ -1,11 +1,11 @@
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types.Function;
-using Object = Interpreter.Types.Object;
 using TrieDictionary;
+using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Tokens.Statements; 
+namespace Interpreter.Tokens.Statements.Binary; 
 
-public class FunctionStatement : Statement {
+public class FunctionStatement : BinaryStatement {
 	public string Name = null!;
 	public FunctionArgument[] Args = null!;
 	public List<TrieDictionary<Object>> Vars = null!;

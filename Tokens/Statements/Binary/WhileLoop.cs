@@ -1,10 +1,9 @@
-using Interpreter.Types.Util;
 using Object = Interpreter.Types.Object;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 
-namespace Interpreter.Tokens.Statements; 
+namespace Interpreter.Tokens.Statements.Binary; 
 
-public class WhileLoop : Statement {
+public class WhileLoop : BinaryStatement {
 	public WhileLoop() {
 		Symbol = "while";
 	}

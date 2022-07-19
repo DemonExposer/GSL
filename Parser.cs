@@ -5,7 +5,8 @@ using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Tokens.Separators;
-using Interpreter.Tokens.Statements;
+using Interpreter.Tokens.Statements.Binary;
+using Interpreter.Tokens.Statements.Unary;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
@@ -13,7 +14,7 @@ namespace Interpreter;
 
 public class Parser {
 	public static int GetTopElementIndex(Token[] line, int startIndex, bool isRightBound) {
-		if (line[startIndex] is Statement)
+		if (line[startIndex] is BinaryStatement)
 			return startIndex;
 	
 		int highestPriorityNum = -1;
@@ -215,14 +216,12 @@ public class Parser {
 			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), vars, lines, ref lineNo, depth+1);
 		} else if (t is ParenthesesOperator parOp) {
 			parOp.Children = ParenthesesParse(line, i, vars, lines, ref lineNo, depth + 1, line[i].Str == "(");
-		} else if (t is MinusUnaryOperator minUnOp) {
-			minUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
-		} else if (t is NotUnaryOperator notUnOp) {
-			notUnOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
+		} else if (t is UnaryOperator unOp) {
+			unOp.Child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
 		} else if (t is VariableToken vt) {
 			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
 				vt.Args = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
-		} else if (t is Statement statement) {
+		} else if (t is BinaryStatement statement) {
 			int addition = 1;
 			if (t is FunctionStatement fs) {
 				addition = 2;
@@ -245,8 +244,13 @@ public class Parser {
 				j++;
 			} while (numBrackets != 0);
 			
-			
 			statement.Right = CurlyBracketsParse(line, lines, ref lineNo, vars, depth + 1);
+		} else if (t is UnaryStatement unStat) {
+			Token child = Parse(line, i + 1, vars, lines, ref lineNo, depth + 1);
+			if (child is not ParenthesesOperator po)
+				throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
+
+			unStat.Child = po;
 		}
 
 		t.Line = line[i].Line;

@@ -1,9 +1,9 @@
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Tokens.Statements; 
+namespace Interpreter.Tokens.Statements.Binary; 
 
-public class OnStatement : Statement {
+public class OnStatement : BinaryStatement {
 	public OnStatement() {
 		Symbol = "on";
 	}

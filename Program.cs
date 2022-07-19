@@ -4,13 +4,14 @@ using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
 using Interpreter.Tokens.Operators.Binary.Boolean;
 using Interpreter.Tokens.Operators.Unary;
-using Interpreter.Tokens.Statements;
 using Interpreter.Types.Function;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Separators;
+using Interpreter.Tokens.Statements.Binary;
+using Interpreter.Tokens.Statements.Unary;
 
 namespace Interpreter;
 
@@ -55,6 +56,7 @@ public class Program {
 		bindings.Insert("on", typeof(OnStatement));
 		bindings.Insert("while", typeof(WhileLoop));
 		bindings.Insert("function", typeof(FunctionStatement));
+		bindings.Insert("return", typeof(ReturnStatement));
 		
 		// Separators
 		bindings.Insert(",", typeof(CommaSeparator));

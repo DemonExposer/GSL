@@ -1,3 +1,4 @@
+using Interpreter.Tokens.Statements.Unary;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
@@ -11,8 +12,12 @@ public class MultilineStatementOperator : NAryOperator {
 	}
 
 	public override Object Evaluate() {
-		foreach (Token t in Children)
+		foreach (Token t in Children) {
+			if (t is ReturnStatement)
+				return t.Evaluate();
+			
 			t.Evaluate();
+		}
 
 		return null!;
 	}
