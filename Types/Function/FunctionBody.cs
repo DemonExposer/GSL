@@ -10,10 +10,5 @@ public class FunctionBody {
 		this.expressions = expressions;
 	}
 
-	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
-	//	expressions.Vars.Add(vars);
-	//	Console.WriteLine(expressions.Vars[^1].GetKeySet()[0]);
-		
-		return expressions.Evaluate(topScopeVars);
-	}
+	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) => expressions.Evaluate(new List<TrieDictionary<Object>> {topScopeVars[0], vars});
 }

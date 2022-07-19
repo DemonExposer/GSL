@@ -34,8 +34,6 @@ public class VariableToken : Token {
 			break;
 		} catch (KeyNotFoundException) { }
 		
-		if (vars.Count == 2)
-			Console.WriteLine(vars[0].GetKeySet().Length);
 		if (res == null!)
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
 
