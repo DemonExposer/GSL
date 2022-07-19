@@ -1,5 +1,6 @@
 using System.Text;
 using Interpreter.Types.Comparable;
+using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens; 
@@ -20,9 +21,7 @@ public class NumberToken : Token {
 		return sb.ToString();
 	}
 
-	public override Object Evaluate() {
-		return Num;
-	}
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => Num;
 
 	public override int Size() => 1;
 }

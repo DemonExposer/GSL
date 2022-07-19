@@ -1,5 +1,6 @@
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
+using TrieDictionary;
 
 namespace Interpreter.Tokens.Operators.Binary.Boolean; 
 
@@ -8,7 +9,5 @@ public class SmallerEqualBinaryOperator : BooleanOperator {
 		Symbol = "<=";
 	}
 	
-	public override Object Evaluate() {
-		return new Types.Comparable.Boolean(((Integer) Left.Evaluate()).Int <= ((Integer) Right.Evaluate()).Int);
-	}
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Types.Comparable.Boolean(((Integer) Left.Evaluate(vars)).Int <= ((Integer) Right.Evaluate(vars)).Int);
 }

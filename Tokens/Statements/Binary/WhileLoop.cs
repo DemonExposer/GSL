@@ -1,3 +1,4 @@
+using TrieDictionary;
 using Object = Interpreter.Types.Object;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 
@@ -8,9 +9,12 @@ public class WhileLoop : BinaryStatement {
 		Symbol = "while";
 	}
 
-	public override Object Evaluate() {
-		while (((Boolean) Left.Evaluate()).Bool)
-			Right.Evaluate();
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
+		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
+		properVars.Add(new TrieDictionary<Object>());
+		
+		while (((Boolean) Left.Evaluate(properVars)).Bool)
+			Right.Evaluate(properVars);
 
 		return null!;
 	}

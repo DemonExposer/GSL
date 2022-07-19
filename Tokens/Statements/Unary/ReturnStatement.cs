@@ -1,3 +1,4 @@
+using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Statements.Unary; 
@@ -7,7 +8,5 @@ public class ReturnStatement : UnaryStatement {
 		Symbol = "return";
 	}
 	
-	public override Object Evaluate() {
-		return Child.Evaluate();
-	}
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => Child.Evaluate(vars);
 }

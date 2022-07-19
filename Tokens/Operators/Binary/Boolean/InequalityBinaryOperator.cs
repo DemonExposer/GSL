@@ -1,4 +1,5 @@
 using Interpreter.Types.Comparable;
+using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Operators.Binary.Boolean; 
@@ -8,8 +9,8 @@ public class InequalityBinaryOperator : BooleanOperator {
 		Symbol = "!=";
 	}
 
-	public override Object Evaluate() {
-		Object leftObj = Left.Evaluate(), rightObj = Right.Evaluate();
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
+		Object leftObj = Left.Evaluate(vars), rightObj = Right.Evaluate(vars);
 		if (leftObj is not Comparable c1)
 			throw new IncomparableException("trying to compare incomparable type " + leftObj.GetType());
 

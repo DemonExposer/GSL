@@ -1,3 +1,4 @@
+using TrieDictionary;
 using Boolean = Interpreter.Types.Comparable.Boolean;
 using Object = Interpreter.Types.Object;
 
@@ -8,5 +9,10 @@ public class OnStatement : BinaryStatement {
 		Symbol = "on";
 	}
 
-	public override Object Evaluate() => ((Boolean) Left.Evaluate()).Bool ? Right.Evaluate() : null!;
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
+		List<TrieDictionary<Object>> properVars = new List<TrieDictionary<Object>>(vars);
+		properVars.Add(new TrieDictionary<Object>());
+		
+		return ((Boolean) Left.Evaluate(properVars)).Bool ? Right.Evaluate(properVars) : null!;
+	}
 }

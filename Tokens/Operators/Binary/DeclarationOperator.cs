@@ -5,17 +5,11 @@ using TrieDictionary;
 namespace Interpreter.Tokens.Operators.Binary; 
 
 public class DeclarationOperator : BinaryOperator {
-	private List<TrieDictionary<Object>> vars = null!;
-	
 	public DeclarationOperator() {
 		Symbol = "decl";
 	}
-
-	public void SetVars(List<TrieDictionary<Object>> vars) {
-		this.vars = vars;
-	}
 	
-	public override Object Evaluate() {
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		try {
 			vars[^1].Get(((VariableToken) Left).Name);
 			throw new InvalidOperationException(((VariableToken) Left).Name + " is already defined");
@@ -25,7 +19,7 @@ public class DeclarationOperator : BinaryOperator {
 		vars[^1][((VariableToken) Left).Name] = res;
 
 		if (Right is AssignmentOperator)
-			return Right.Evaluate();
+			return Right.Evaluate(vars);
 		
 		return res;
 	}

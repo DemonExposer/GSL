@@ -99,17 +99,17 @@ public class Program {
 			if (lexedLine.Length == 0)
 				continue;
 			
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine, new [] {vars}.ToList());
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.GetType());
 		//	Console.WriteLine("]");
 		
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), new [] {vars}.ToList(), lines, ref i, 0);
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
-			tree.Evaluate();
+			tree.Evaluate(new List<TrieDictionary<Object>> {vars});
 		}
 	}
 }

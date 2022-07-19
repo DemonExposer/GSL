@@ -3,7 +3,6 @@ using TrieDictionary;
 namespace Interpreter.Types.Function; 
 
 public class Function : Object {
-	private TrieDictionary<Object> vars = null!;
 	public FunctionArgument[] Args;
 	private FunctionBody body;
 
@@ -12,11 +11,11 @@ public class Function : Object {
 		this.body = body;
 	}
 
-	public Object Execute(Object[] args) {
-		vars = new TrieDictionary<Object>();
+	public Object Execute(Object[] args, List<TrieDictionary<Object>> topScopeVars) {
+		TrieDictionary<Object> vars = new TrieDictionary<Object>();
 
 		if (args.Length == 0 && Args.Length == 0)
-			return body.Execute(args, vars);
+			return body.Execute(args, vars, topScopeVars);
 		
 		if (!Args[^1].IsUnlimited && args.Length != Args.Length)
 			throw new InvalidOperationException("Args incorrect length: is: " + args.Length + ", should be: " +
@@ -33,7 +32,7 @@ public class Function : Object {
 				vars[Args[i].Name] = args[i];
 		}
 
-		return body.Execute(args, vars);
+		return body.Execute(args, vars, topScopeVars);
 	}
 
 	public override string ToString() => "Function";

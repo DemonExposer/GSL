@@ -9,12 +9,7 @@ namespace Interpreter.Tokens;
 public class VariableToken : Token {
 	public string Name = null!;
 	public Token Args = null!;
-	private List<TrieDictionary<Object>> vars;
 
-	public VariableToken(List<TrieDictionary<Object>> vars) {
-		this.vars = vars;
-	}
-	
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
 		
@@ -31,7 +26,7 @@ public class VariableToken : Token {
 		return sb.ToString();
 	}
 
-	public override Object Evaluate() {
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		Object res = null!;
 
 		for (int i = vars.Count - 1; i >= 0; i--) try {
@@ -45,8 +40,8 @@ public class VariableToken : Token {
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
 
 		if (res is Function f) {
-			Object o = Args.Evaluate();
-			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o});
+			Object o = Args.Evaluate(vars);
+			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
 		}
 
 		return res;

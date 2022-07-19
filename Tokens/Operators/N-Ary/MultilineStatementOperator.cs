@@ -5,18 +5,16 @@ using Object = Interpreter.Types.Object;
 namespace Interpreter.Tokens.Operators.N_Ary; 
 
 public class MultilineStatementOperator : NAryOperator {
-	public List<TrieDictionary<Object>> Vars = null!;
-
 	public MultilineStatementOperator() {
 		Symbol = "{}";
 	}
 
-	public override Object Evaluate() {
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		foreach (Token t in Children) {
 			if (t is ReturnStatement)
-				return t.Evaluate();
+				return t.Evaluate(vars);
 			
-			t.Evaluate();
+			t.Evaluate(vars);
 		}
 
 		return null!;
