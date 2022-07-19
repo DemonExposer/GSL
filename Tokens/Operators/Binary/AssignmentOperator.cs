@@ -20,8 +20,6 @@ public class AssignmentOperator : BinaryOperator {
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + ((VariableToken) Left).Name + " does not exist");
 
 		Object res = Right.Evaluate(vars);
-		// TODO: check if this remove can be removed
-		vars[scopeIndex].Remove(((VariableToken) Left).Name);
 		vars[scopeIndex][((VariableToken) Left).Name] = res;
 		
 		return res;
