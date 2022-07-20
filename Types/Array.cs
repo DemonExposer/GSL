@@ -10,6 +10,9 @@ public class Array : Object {
 	}
 	
 	public override string ToString() {
+		if (Arr.Count == 0)
+			return "[]";
+		
 		StringBuilder sb = new StringBuilder("[");
 		Arr.ForEach(o => sb.Append(o.ToString()).Append(", "));
 		sb.Append("\u0008\u0008]");
