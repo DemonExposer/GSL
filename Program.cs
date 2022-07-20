@@ -74,6 +74,9 @@ public class Program {
 		
 		// Separators
 		Bindings.Insert(",", typeof(CommaSeparator));
+		
+		// Misc
+		Bindings.Insert(":", typeof(ConcatenationOperator));
 
 		// Low number for priority means a higher priority
 		Priorities.Insert("(", 0);
@@ -96,7 +99,8 @@ public class Program {
 		Priorities.Insert("and", 8);
 		Priorities.Insert("||", 9);
 		Priorities.Insert("or", 9);
-		Priorities.Insert("decl", 10);
+		Priorities.Insert(":", 10);
+		Priorities.Insert("decl", 11);
 		
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params
