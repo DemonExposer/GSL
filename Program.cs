@@ -12,6 +12,8 @@ using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
+using Array = Interpreter.Types.Array;
+using String = Interpreter.Types.String;
 
 namespace Interpreter;
 
@@ -101,6 +103,7 @@ public class Program {
 		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "arg"}}, new Print(null!)));
 		vars.Insert("false", new Boolean(false));
 		vars.Insert("true", new Boolean(true));
+		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
