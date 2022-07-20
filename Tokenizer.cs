@@ -14,7 +14,7 @@ public class Tokenizer {
 			if (line[i].Str == "-") { // Minus is unary when it is the first token or if the previous token is an operator
 				Type prevType = null!;
 				try {
-					prevType = Program.bindings[line[i - 1].Str];
+					prevType = Program.Bindings[line[i - 1].Str];
 				} catch (KeyNotFoundException) { }
 				
 				if (i == 0 || prevType != null!) {
@@ -26,7 +26,7 @@ public class Tokenizer {
 
 			Type tokenType = null!;
 			try {
-				tokenType = Program.bindings[line[i].Str];
+				tokenType = Program.Bindings[line[i].Str];
 			} catch (KeyNotFoundException) { }
 			
 			if (tokenType != null!) { // Check if string is a keyword/operator

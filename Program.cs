@@ -16,72 +16,85 @@ using Interpreter.Tokens.Statements.Unary;
 namespace Interpreter;
 
 public class Program {
-	public static TrieDictionary<Type> bindings = new ();
+	public static TrieDictionary<Type> Bindings = new ();
+	public static TrieDictionary<int> Priorities = new ();
+	public static List<string> OpeningBrackets = new ();
+	public static List<string> ClosingBrackets = new ();
 	private static TrieDictionary<Object> vars = new ();
-	public static TrieDictionary<int> priorities = new ();
 
 	public static void Main(string[] args) {
 		// Arithmetic
-		bindings.Insert("+", typeof(PlusBinaryOperator));
-		bindings.Insert("-", typeof(MinusBinaryOperator));
-		bindings.Insert("*", typeof(MultiplicationBinaryOperator));
-		bindings.Insert("/", typeof(DivisionBinaryOperator));
-		bindings.Insert("%", typeof(ModulusBinaryOperator));
-		bindings.Insert("^", typeof(PowerBinaryOperator));
+		Bindings.Insert("+", typeof(PlusBinaryOperator));
+		Bindings.Insert("-", typeof(MinusBinaryOperator));
+		Bindings.Insert("*", typeof(MultiplicationBinaryOperator));
+		Bindings.Insert("/", typeof(DivisionBinaryOperator));
+		Bindings.Insert("%", typeof(ModulusBinaryOperator));
+		Bindings.Insert("^", typeof(PowerBinaryOperator));
 		
 		// Variable initialization
-		bindings.Insert("decl", typeof(DeclarationOperator));
-		bindings.Insert("=", typeof(AssignmentOperator));
+		Bindings.Insert("decl", typeof(DeclarationOperator));
+		Bindings.Insert("=", typeof(AssignmentOperator));
 		
 		// Brackets
-		bindings.Insert("(", typeof(ParenthesesOperator));
-		bindings.Insert(")", typeof(ParenthesesOperator));
-		bindings.Insert("{", typeof(MultilineStatementOperator));
-		bindings.Insert("}", typeof(MultilineStatementOperator));
+		Bindings.Insert("(", typeof(ParenthesesOperator));
+		Bindings.Insert(")", typeof(ParenthesesOperator));
+		Bindings.Insert("{", typeof(MultilineStatementOperator));
+		Bindings.Insert("}", typeof(MultilineStatementOperator));
+		Bindings.Insert("[", typeof(SquareBracketOperator));
+		Bindings.Insert("]", typeof(SquareBracketOperator));
+		
+		OpeningBrackets.Add("(");
+		OpeningBrackets.Add("{");
+		OpeningBrackets.Add("[");
+		
+		ClosingBrackets.Add(")");
+		ClosingBrackets.Add("}");
+		ClosingBrackets.Add("]");
 		
 		// Boolean logic
-		bindings.Insert("&&", typeof(AndBinaryOperator));
-		bindings.Insert("and", typeof(AndBinaryOperator));
-		bindings.Insert("||", typeof(OrBinaryOperator));
-		bindings.Insert("or", typeof(OrBinaryOperator));
-		bindings.Insert("==", typeof(EqualityBinaryOperator));
-		bindings.Insert("!=", typeof(InequalityBinaryOperator));
-		bindings.Insert(">", typeof(LargerBinaryOperator));
-		bindings.Insert("<", typeof(SmallerBinaryOperator));
-		bindings.Insert("<=", typeof(SmallerEqualBinaryOperator));
-		bindings.Insert(">=", typeof(LargerEqualBinaryOperator));
-		bindings.Insert("!", typeof(NotUnaryOperator));
+		Bindings.Insert("&&", typeof(AndBinaryOperator));
+		Bindings.Insert("and", typeof(AndBinaryOperator));
+		Bindings.Insert("||", typeof(OrBinaryOperator));
+		Bindings.Insert("or", typeof(OrBinaryOperator));
+		Bindings.Insert("==", typeof(EqualityBinaryOperator));
+		Bindings.Insert("!=", typeof(InequalityBinaryOperator));
+		Bindings.Insert(">", typeof(LargerBinaryOperator));
+		Bindings.Insert("<", typeof(SmallerBinaryOperator));
+		Bindings.Insert("<=", typeof(SmallerEqualBinaryOperator));
+		Bindings.Insert(">=", typeof(LargerEqualBinaryOperator));
+		Bindings.Insert("!", typeof(NotUnaryOperator));
 		
 		// Statements
-		bindings.Insert("on", typeof(OnStatement));
-		bindings.Insert("while", typeof(WhileLoop));
-		bindings.Insert("function", typeof(FunctionStatement));
-		bindings.Insert("return", typeof(ReturnStatement));
+		Bindings.Insert("on", typeof(OnStatement));
+		Bindings.Insert("while", typeof(WhileLoop));
+		Bindings.Insert("function", typeof(FunctionStatement));
+		Bindings.Insert("return", typeof(ReturnStatement));
 		
 		// Separators
-		bindings.Insert(",", typeof(CommaSeparator));
+		Bindings.Insert(",", typeof(CommaSeparator));
 
 		// Low number for priority means a higher priority
-		priorities.Insert("(", 0);
-		priorities.Insert("!", 1);
-		priorities.Insert("^", 2);
-		priorities.Insert("*", 3);
-		priorities.Insert("/", 3);
-		priorities.Insert("%", 3);
-		priorities.Insert("+", 4);
-		priorities.Insert("-", 4);
-		priorities.Insert("=", 5);
-		priorities.Insert(">", 6);
-		priorities.Insert("<", 6);
-		priorities.Insert("<=", 6);
-		priorities.Insert(">=", 6);
-		priorities.Insert("==", 7);
-		priorities.Insert("!=", 7);
-		priorities.Insert("&&", 8);
-		priorities.Insert("and", 8);
-		priorities.Insert("||", 9);
-		priorities.Insert("or", 9);
-		priorities.Insert("decl", 10);
+		Priorities.Insert("(", 0);
+		Priorities.Insert("[", 0);
+		Priorities.Insert("!", 1);
+		Priorities.Insert("^", 2);
+		Priorities.Insert("*", 3);
+		Priorities.Insert("/", 3);
+		Priorities.Insert("%", 3);
+		Priorities.Insert("+", 4);
+		Priorities.Insert("-", 4);
+		Priorities.Insert("=", 5);
+		Priorities.Insert(">", 6);
+		Priorities.Insert("<", 6);
+		Priorities.Insert("<=", 6);
+		Priorities.Insert(">=", 6);
+		Priorities.Insert("==", 7);
+		Priorities.Insert("!=", 7);
+		Priorities.Insert("&&", 8);
+		Priorities.Insert("and", 8);
+		Priorities.Insert("||", 9);
+		Priorities.Insert("or", 9);
+		Priorities.Insert("decl", 10);
 		
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params
@@ -103,8 +116,8 @@ public class Program {
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
-		//		Console.Write("{0}, ", t.GetType());
-		//	Console.WriteLine("]");
+		//		Console.Write("{0}, ", t.Str);
+		//	Console.WriteLine("\u0008\u0008]");
 		
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, 0);
 

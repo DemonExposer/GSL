@@ -22,21 +22,21 @@ public class Parser {
 		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
 			int priority = -1;
 			int numBrackets = 0;
-			if (line[i].Str == "(")
+			if (Program.OpeningBrackets.Contains(line[i].Str))
 				numBrackets++;
-			else if (line[i].Str == ")")
+			else if (Program.ClosingBrackets.Contains(line[i].Str))
 				numBrackets--;
 			
 			while (numBrackets != 0) {
 				i += isRightBound ? 1 : -1;
-				if (line[i].Str == "(")
+				if (Program.OpeningBrackets.Contains(line[i].Str))
 					numBrackets++;
-				else if (line[i].Str == ")")
+				else if (Program.ClosingBrackets.Contains(line[i].Str))
 					numBrackets--;
 			}
 			
 			try {
-				priority = Program.priorities[line[i].Str];
+				priority = Program.Priorities[line[i].Str];
 			} catch (KeyNotFoundException) { }
 			
 			if (!line[i].IsDone && line[i] is BinaryOperator && priority != -1) {
@@ -70,9 +70,9 @@ public class Parser {
 		if (j == startIndex && !isRightBound) {
 			int numBrackets = 0;
 			while (numBrackets != 0 || j >= 0 && line[j] is not BinaryOperator) {
-				if (line[j].Str == "(")
+				if (Program.OpeningBrackets.Contains(line[j].Str))
 					numBrackets++;
-				else if (line[j].Str == ")")
+				else if (Program.ClosingBrackets.Contains(line[j].Str))
 					numBrackets--;
 
 				j--;
@@ -91,16 +91,16 @@ public class Parser {
 	}
 
 	/**
-	 * Removes parentheses and parses inside expression(s) by identifying the top operator and calling Parse
+	 * Removes brackets and parses inside expression(s) by identifying the top operator and calling Parse
 	 */
-	private static Token[] ParenthesesParse(Token[] line, int i, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+	private static Token[] BracketsParse(Token[] line, int i, string[] lines, ref int lineNo, int depth, bool isRightBound) {
 		List<Token[]> arguments = new List<Token[]>();
 		List<Token> subLine = new List<Token>();
 		int numBrackets = 0;
-		for (int j = i + (isRightBound ? 1 : -1); line[j].Str != (isRightBound ? ")" : "("); j += isRightBound ? 1 : -1) {
-			if (line[j].Str == "(")
+		for (int j = i + (isRightBound ? 1 : -1); isRightBound ? !Program.ClosingBrackets.Contains(line[j].Str) : !Program.OpeningBrackets.Contains(line[j].Str); j += isRightBound ? 1 : -1) {
+			if (Program.OpeningBrackets.Contains(line[j].Str))
 				numBrackets++;
-			else if (line[j].Str == ")")
+			else if (Program.ClosingBrackets.Contains(line[j].Str))
 				numBrackets--;
 			
 			while (numBrackets != 0) {
@@ -111,9 +111,9 @@ public class Parser {
 				
 				j += isRightBound ? 1 : -1;
 				
-				if (line[j].Str == "(")
+				if (Program.OpeningBrackets.Contains(line[j].Str))
 					numBrackets++;
-				else if (line[j].Str == ")")
+				else if (Program.ClosingBrackets.Contains(line[j].Str))
 					numBrackets--;
 			}
 
@@ -191,61 +191,78 @@ public class Parser {
 	public static Token Parse(Token[] line, int i, string[] lines, ref int lineNo, int depth) {
 		Token t = line[i];
 
-		// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
-		if (t is ArithmeticOperator or BooleanOperator) {
-			line[i].IsDone = true;
+		switch (t) {
+			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
+			case ArithmeticOperator or BooleanOperator:
+				line[i].IsDone = true;
 
-			// Parse only the appropriate section (i.e. Left should only parse to the left and Right only to the right, that's what the array slicing does)
-			((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, lines, ref lineNo, depth + 1, false);
-			((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, lines, ref lineNo, depth + 1, true);
-		} else if (t is DeclarationOperator decOp) {
-			decOp.Left = Parse(line, i + 1, lines, ref lineNo, depth+1);
+				// Parse only the appropriate section (i.e. Left should only parse to the left and Right only to the right, that's what the array slicing does)
+				((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, lines, ref lineNo, depth + 1, false);
+				((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, lines, ref lineNo, depth + 1, true);
+				break;
+			case DeclarationOperator decOp: {
+				decOp.Left = Parse(line, i + 1, lines, ref lineNo, depth+1);
 			
-			if (i + 2 < line.Length) // Only Parse right hand side if it exists
-				decOp.Right = Parse(line, i + 2, lines, ref lineNo, depth + 1);
-		} else if (t is AssignmentOperator assOp) {
-			assOp.IsDone = true;
-			
-			assOp.Left = Parse(line, i - 1, lines, ref lineNo, depth+1);
-			Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
-			assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), lines, ref lineNo, depth+1);
-		} else if (t is ParenthesesOperator parOp) {
-			parOp.Children = ParenthesesParse(line, i, lines, ref lineNo, depth + 1, line[i].Str == "(");
-		} else if (t is UnaryOperator unOp) {
-			unOp.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-		} else if (t is VariableToken vt) {
-			if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
-				vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-		} else if (t is BinaryStatement statement) {
-			int addition = 1;
-			if (t is FunctionStatement fs) {
-				addition = 2;
-				fs.Name = line[i + 1].Str;
+				if (i + 2 < line.Length) // Only Parse right hand side if it exists
+					decOp.Right = Parse(line, i + 2, lines, ref lineNo, depth + 1);
+				break;
 			}
-			Token left = Parse(line, i + addition, lines, ref lineNo, depth + 1);
-			if (left is not ParenthesesOperator po)
-				throw new FormatException("statement condition/parameter declaration on line " + left.Line + " is missing parentheses");
+			case AssignmentOperator assOp: {
+				assOp.IsDone = true;
 			
-			statement.Left = po;
+				assOp.Left = Parse(line, i - 1, lines, ref lineNo, depth+1);
+				Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
+				assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), lines, ref lineNo, depth+1);
+				break;
+			}
+			case ParenthesesOperator parOp:
+				parOp.Children = BracketsParse(line, i, lines, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
+				break;
+			case SquareBracketOperator sqOp:
+				sqOp.Children = BracketsParse(line, i, lines, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
+				break;
+			case UnaryOperator unOp:
+				unOp.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				break;
+			case VariableToken vt: {
+				if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
+					vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				break;
+			}
+			case BinaryStatement statement: {
+				int addition = 1;
+				if (t is FunctionStatement fs) {
+					addition = 2;
+					fs.Name = line[i + 1].Str;
+				}
+				Token left = Parse(line, i + addition, lines, ref lineNo, depth + 1);
+				if (left is not ParenthesesOperator po)
+					throw new FormatException("statement condition/parameter declaration on line " + left.Line + " is missing parentheses");
 			
-			int numBrackets = 0;
-			int j = i+1;
-			do {
-				if (line[j].Str == ")")
-					numBrackets--;
-				else if (line[j].Str == "(")
-					numBrackets++;
+				statement.Left = po;
+			
+				int numBrackets = 0;
+				int j = i+1;
+				do {
+					if (Program.ClosingBrackets.Contains(line[j].Str))
+						numBrackets--;
+					else if (Program.OpeningBrackets.Contains(line[j].Str))
+						numBrackets++;
 				
-				j++;
-			} while (numBrackets != 0);
+					j++;
+				} while (numBrackets != 0);
 			
-			statement.Right = CurlyBracketsParse(line, lines, ref lineNo, depth + 1);
-		} else if (t is UnaryStatement unStat) {
-			Token child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-			if (child is not ParenthesesOperator po)
-				throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
+				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, depth + 1);
+				break;
+			}
+			case UnaryStatement unStat: {
+				Token child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				if (child is not ParenthesesOperator po)
+					throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
 
-			unStat.Child = po;
+				unStat.Child = po;
+				break;
+			}
 		}
 
 		t.Line = line[i].Line;

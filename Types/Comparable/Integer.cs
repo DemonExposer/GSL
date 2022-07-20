@@ -7,13 +7,9 @@ public class Integer : Comparable {
 		Int = i;
 	}
 	
-	public override string ToString() {
-		return Int.ToString();
-	}
+	public override string ToString() => Int.ToString();
 
-	public override string GetType() {
-		return "Integer";
-	}
+	public override string GetType() => "Integer";
 
 	public override Boolean Equals(Comparable c) {
 		if (c is not Integer i)
