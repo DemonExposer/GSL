@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types.Comparable;
+using String = Interpreter.Types.String;
 
 namespace Interpreter; 
 
@@ -39,6 +40,10 @@ public class Tokenizer {
 				NumberToken nt = new NumberToken();
 				nt.Num = new Integer(Int32.Parse(line[i].Str));
 				res[i] = nt;
+			} else if (Regex.Matches(line[i].Str, "\".+\"").Count == 1) {
+				StringToken st = new StringToken();
+				st.StrVal = new String(line[i].Str.Substring(1, line[i].Str.Length-2));
+				res[i] = st;
 			} else {
 				throw new InvalidExpressionException("Line " + line[i].Line + ": " + line[i].Str + " is not a valid expression");
 			}
