@@ -49,7 +49,7 @@ public class VariableToken : Token {
 
 		if (res is Array a && Index != null!) {
 			Array arr = (Array) Index.Evaluate(vars);
-			if (arr.Arr.Count > 1 || arr.Arr[0] is not Integer)
+			if (arr.Arr.Count != 1 || arr.Arr[0] is not Integer)
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];

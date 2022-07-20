@@ -24,7 +24,12 @@ public class AssignmentOperator : BinaryOperator {
 		Object res = Right.Evaluate(vars);
 		if (((VariableToken) Left).Index != null!) {
 			Array arr = (Array) ((VariableToken) Left).Index.Evaluate(vars);
-			if (arr.Arr.Count > 1 || arr.Arr[0] is not Integer)
+			if (arr.Arr.Count == 0) {
+				((Array) vars[scopeIndex][((VariableToken) Left).Name]).Arr.Add(res);
+				return res;
+			}
+
+			if (arr.Arr.Count != 1 || arr.Arr[0] is not Integer)
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];
