@@ -209,8 +209,26 @@ public class Parser {
 			}
 			case AssignmentOperator assOp: {
 				assOp.IsDone = true;
+
+				int numBrackets = 0;
+				int j;
+				for (j = i; j >= 0 && line[j + 1] is not VariableToken || j == i; j--) {
+					if (Program.OpeningBrackets.Contains(line[j].Str))
+						numBrackets++;
+					else if (Program.ClosingBrackets.Contains(line[j].Str))
+						numBrackets--;
 			
-				assOp.Left = Parse(line, i - 1, lines, ref lineNo, depth+1);
+					while (numBrackets != 0) {
+						j--;
+				
+						if (Program.OpeningBrackets.Contains(line[j].Str))
+							numBrackets++;
+						else if (Program.ClosingBrackets.Contains(line[j].Str))
+							numBrackets--;
+					}
+				}
+				
+				assOp.Left = Parse(line, j + 1, lines, ref lineNo, depth+1);
 				Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
 				assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), lines, ref lineNo, depth+1);
 				break;
