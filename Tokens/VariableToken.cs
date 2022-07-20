@@ -1,14 +1,17 @@
 using System.Text;
+using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
 using Interpreter.Types.Util;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
+using Array = Interpreter.Types.Array;
 
 namespace Interpreter.Tokens;
 
 public class VariableToken : Token {
 	public string Name = null!;
 	public Token Args = null!;
+	public Token Index = null!;
 
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -22,6 +25,8 @@ public class VariableToken : Token {
 
 		if (Args != null)
 			sb.Append(Args.ToString(indent + 1));
+		if (Index != null)
+			sb.Append(Index.ToString(indent + 1));
 
 		return sb.ToString();
 	}
@@ -40,6 +45,16 @@ public class VariableToken : Token {
 		if (res is Function f) {
 			Object o = Args.Evaluate(vars);
 			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
+		}
+
+		if (res is Array a && Index != null!) {
+			Array arr = (Array) Index.Evaluate(vars);
+			if (arr.Arr.Count != 1 || arr.Arr[0] is not Integer)
+				throw new FormatException("Line " + Line +  ": index must be of type Integer");
+
+			Integer i = (Integer) arr.Arr[0];
+			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
+			return a.Arr[index];
 		}
 
 		return res;

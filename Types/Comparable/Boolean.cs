@@ -7,13 +7,9 @@ public class Boolean : Comparable {
 		Bool = b;
 	}
 
-	public override string ToString() {
-		return Bool ? "true" : "false";
-	}
+	public override string ToString() => Bool ? "true" : "false";
 
-	public override string GetType() {
-		return "Boolean";
-	}
+	public override string GetType() => "Boolean";
 
 	public override Boolean Equals(Comparable c) {
 		if (c is not Boolean b)
