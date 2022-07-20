@@ -53,7 +53,7 @@ public class VariableToken : Token {
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];
-			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int;
+			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
 			return a.Arr[index];
 		}
 
