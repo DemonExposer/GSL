@@ -225,8 +225,11 @@ public class Parser {
 				unOp.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
 				break;
 			case VariableToken vt: {
-				if (i + 1 < line.Length && line[i+1] is ParenthesesOperator)
-					vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				if (i + 1 < line.Length)
+					if (line[i+1] is ParenthesesOperator)
+						vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+					else if (line[i + 1] is SquareBracketOperator)
+						vt.Index = Parse(line, i + 1, lines, ref lineNo, depth + 1);
 				break;
 			}
 			case BinaryStatement statement: {
