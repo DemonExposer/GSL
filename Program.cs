@@ -12,6 +12,8 @@ using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
+using Array = Interpreter.Types.Array;
+using String = Interpreter.Types.String;
 
 namespace Interpreter;
 
@@ -72,6 +74,9 @@ public class Program {
 		
 		// Separators
 		Bindings.Insert(",", typeof(CommaSeparator));
+		
+		// Misc
+		Bindings.Insert(":", typeof(ConcatenationOperator));
 
 		// Low number for priority means a higher priority
 		Priorities.Insert("(", 0);
@@ -94,13 +99,15 @@ public class Program {
 		Priorities.Insert("and", 8);
 		Priorities.Insert("||", 9);
 		Priorities.Insert("or", 9);
-		Priorities.Insert("decl", 10);
+		Priorities.Insert(":", 10);
+		Priorities.Insert("decl", 11);
 		
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params
 		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "arg"}}, new Print(null!)));
 		vars.Insert("false", new Boolean(false));
 		vars.Insert("true", new Boolean(true));
+		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
