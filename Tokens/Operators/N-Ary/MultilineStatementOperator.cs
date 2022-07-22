@@ -26,9 +26,9 @@ public class MultilineStatementOperator : NAryOperator {
 				Object obj = t.Evaluate(vars);
 				if (obj != null!)
 					return obj;
+			} else {
+				t.Evaluate(vars);
 			}
-			
-			t.Evaluate(vars);
 		}
 
 		return null!;
