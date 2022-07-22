@@ -1,6 +1,8 @@
 # GSL
 <img src="img/logo.png" width=200 align="right" />
 This repository contains the official interpreter for GSL (General Scripting Language).<br/>
+First of all, this is the first interpreter I've ever made, so expect it to be slow and resource heavy.
+If you can figure out how to make it better, make a pull request.<br/>
 
 ### Installation
 #### Prerequisites
