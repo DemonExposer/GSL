@@ -161,6 +161,14 @@ public class Parser {
 			lexedLine = CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
+
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+
+			int before = i;
+			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
+
+			if (i != before)
+				continue;
 			
 			foreach (CheckedString cs in lexedLine)
 				if (cs.Str == "}")
@@ -170,14 +178,6 @@ public class Parser {
 
 			if (numBrackets == 0)
 				break;
-
-			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
-
-			int before = i;
-			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
-
-			if (i != before)
-				continue;
 		}
 		
 		if (i >= lines.Length)

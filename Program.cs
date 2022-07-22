@@ -46,11 +46,9 @@ public class Program {
 		Bindings.Insert("]", typeof(SquareBracketOperator));
 		
 		OpeningBrackets.Add("(");
-		OpeningBrackets.Add("{");
 		OpeningBrackets.Add("[");
 		
 		ClosingBrackets.Add(")");
-		ClosingBrackets.Add("}");
 		ClosingBrackets.Add("]");
 		
 		// Boolean logic
