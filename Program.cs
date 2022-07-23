@@ -103,6 +103,7 @@ public class Program {
 		// Standard defined variables
 		// TODO: Make sure print accepts an undefined number of params
 		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "arg"}}, new Print(null!)));
+		vars.Insert("read", new Function(new FunctionArgument[0], new Read(null!)));
 		vars.Insert("false", new Boolean(false));
 		vars.Insert("true", new Boolean(true));
 		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
