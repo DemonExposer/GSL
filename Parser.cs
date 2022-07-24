@@ -18,7 +18,6 @@ public class Parser {
 		int highestPriorityNum = -1;
 		int index = -1;
 		for (int i = startIndex; i < line.Length && i >= 0; i += isRightBound ? 1 : -1) {
-			int priority = -1;
 			int numBrackets = 0;
 			if (Program.OpeningBrackets.Contains(line[i].Str))
 				numBrackets++;
@@ -32,12 +31,9 @@ public class Parser {
 				else if (Program.ClosingBrackets.Contains(line[i].Str))
 					numBrackets--;
 			}
-			
-			try {
-				priority = Program.Priorities[line[i].Str];
-			} catch (KeyNotFoundException) { }
-			
-			if (!line[i].IsDone && line[i] is BinaryOperator && priority != -1) {
+
+			if (!line[i].IsDone && line[i] is BinaryOperator && Program.Priorities.Contains(line[i].Str)) {
+				int priority = Program.Priorities[line[i].Str];
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
 					index = i;

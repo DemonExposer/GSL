@@ -18,11 +18,9 @@ public class FunctionStatement : BinaryStatement {
 		Args = Left.Children.Cast<VariableToken>().ToList().Select(vt => new FunctionArgument {ArgType = typeof(Object), IsUnlimited = false, Name = vt.Name}).ToArray();
 		body = new FunctionBody((MultilineStatementOperator) Right);
 
-		try {
-			vars[^1].Get(Name);
+		if (vars[^1].Contains(Name))
 			throw new InvalidOperationException(Name + " is already defined");
-		} catch (KeyNotFoundException) { }
-		
+
 		Object res = new Function(Args, body);
 		vars[^1][Name] = res;
 

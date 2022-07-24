@@ -1,5 +1,4 @@
 using Interpreter.Types;
-using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 
@@ -11,11 +10,9 @@ public class DeclarationOperator : BinaryOperator {
 	}
 	
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
-		try {
-			vars[^1].Get(((VariableToken) Left).Name);
+		if (vars[^1].Contains(((VariableToken) Left).Name))
 			throw new InvalidOperationException(((VariableToken) Left).Name + " is already defined");
-		} catch (KeyNotFoundException) { }
-		
+
 		Object res = new Null();
 		vars[^1][((VariableToken) Left).Name] = res;
 
