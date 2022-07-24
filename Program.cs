@@ -14,7 +14,7 @@ using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
 using Interpreter.Types;
 using Array = Interpreter.Types.Array;
-using String = Interpreter.Types.String;
+using String = Interpreter.Types.Comparable.String;
 
 namespace Interpreter;
 
@@ -67,6 +67,7 @@ public class Program {
 		
 		// Statements
 		Bindings.Insert("on", typeof(OnStatement));
+		Bindings.Insert("else", typeof(ElseStatement));
 		Bindings.Insert("while", typeof(WhileLoop));
 		Bindings.Insert("function", typeof(FunctionStatement));
 		Bindings.Insert("return", typeof(ReturnStatement));

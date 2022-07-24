@@ -1,11 +1,10 @@
 using Interpreter.Tokens.Operators.N_Ary;
-using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
 using TrieDictionary;
 
-namespace Interpreter.Types; 
+namespace Interpreter.Types.Comparable; 
 
-public class String : Object {
+public class String : Comparable {
 	public string Str = null!;
 
 	public String(string s) {
@@ -16,6 +15,13 @@ public class String : Object {
 	public override string ToString() => Str;
 
 	public override string GetType() => "String";
+	
+	public override Boolean Equals(Comparable c) {
+		if (c is not String s)
+			throw new IncomparableException("trying to compare String with non-String");
+
+		return new Boolean(Str == s.Str);
+	}
 
 	private class LengthGetter : FunctionBody {
 		private String context;

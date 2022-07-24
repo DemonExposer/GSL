@@ -5,7 +5,7 @@ namespace Interpreter.Tokens.Statements.Unary;
 
 public abstract class UnaryStatement : Token {
 	public string Symbol = null!;
-	public ParenthesesOperator Child = null!;
+	public Token Child = null!;
 	
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();

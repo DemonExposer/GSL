@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types.Comparable;
-using String = Interpreter.Types.String;
+using String = Interpreter.Types.Comparable.String;
 
 namespace Interpreter; 
 

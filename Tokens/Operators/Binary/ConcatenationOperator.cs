@@ -1,6 +1,6 @@
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
-using String = Interpreter.Types.String;
+using String = Interpreter.Types.Comparable.String;
 
 namespace Interpreter.Tokens.Operators.Binary; 
 

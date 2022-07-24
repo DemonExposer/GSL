@@ -7,8 +7,6 @@ using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
-using TrieDictionary;
-using Object = Interpreter.Types.Object;
 
 namespace Interpreter; 
 
@@ -150,7 +148,7 @@ public class Parser {
 	/**
 	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
 	 */
-	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
 		int initialIndex = ++i; // immediately increment i so that this function doesn't try to parse itself, but instead the next line (also fixes the error message)
@@ -169,16 +167,22 @@ public class Parser {
 
 			if (i != before)
 				continue;
-			
-			foreach (CheckedString cs in lexedLine)
+
+			foreach (CheckedString cs in lexedLine) {
 				if (cs.Str == "}")
 					numBrackets--;
 				else if (cs.Str == "{")
 					numBrackets++;
 
-			if (numBrackets == 0)
-				break;
+				if (numBrackets == 0) {
+					if (parent is OnStatement onStat && tokenizedLine.Length > 1 && tokenizedLine[1] is ElseStatement)
+						onStat.ElseChild = (ElseStatement) Parse(tokenizedLine, 1, lines, ref i, depth + 1);
+					
+					goto FullBreak;
+				}
+			}
 		}
+		FullBreak:
 		
 		if (i >= lines.Length)
 			throw new FormatException("no matched bracket for bracket on line " + initialIndex);
@@ -277,7 +281,15 @@ public class Parser {
 					j++;
 				} while (numBrackets != 0);
 			
-				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, depth + 1);
+				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
+				break;
+			}
+			case ElseStatement elseStat: {
+				Token child = CurlyBracketsParse(line, lines, ref lineNo, elseStat, depth + 1);
+				if (child is not MultilineStatementOperator mso)
+					throw new FormatException("else statement argument on line " + child.Line + " needs curly brackets");
+
+				elseStat.Child = mso;
 				break;
 			}
 			case UnaryStatement unStat: {
