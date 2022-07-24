@@ -86,18 +86,18 @@ public class Program {
 		Priorities.Insert("%", 3);
 		Priorities.Insert("+", 4);
 		Priorities.Insert("-", 4);
-		Priorities.Insert("=", 5);
-		Priorities.Insert(">", 6);
-		Priorities.Insert("<", 6);
-		Priorities.Insert("<=", 6);
-		Priorities.Insert(">=", 6);
-		Priorities.Insert("==", 7);
-		Priorities.Insert("!=", 7);
-		Priorities.Insert("&&", 8);
-		Priorities.Insert("and", 8);
-		Priorities.Insert("||", 9);
-		Priorities.Insert("or", 9);
-		Priorities.Insert(":", 10);
+		Priorities.Insert(">", 5);
+		Priorities.Insert("<", 5);
+		Priorities.Insert("<=", 5);
+		Priorities.Insert(">=", 5);
+		Priorities.Insert("==", 6);
+		Priorities.Insert("!=", 6);
+		Priorities.Insert("&&", 7);
+		Priorities.Insert("and", 7);
+		Priorities.Insert("||", 8);
+		Priorities.Insert("or", 8);
+		Priorities.Insert(":", 9);
+		Priorities.Insert("=", 10);
 		Priorities.Insert("decl", 11);
 		
 		// Standard defined variables
