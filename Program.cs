@@ -78,6 +78,7 @@ public class Program {
 		// Misc
 		Bindings.Insert(":", typeof(ConcatenationOperator));
 		Bindings.Insert(".", typeof(DotOperator));
+		Bindings.Insert("...", typeof(UnlimitedArgumentOperator));
 
 		// Low number for priority means a higher priority
 		Priorities.Insert("(", 0);

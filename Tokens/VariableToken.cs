@@ -12,6 +12,7 @@ public class VariableToken : Token {
 	public string Name = null!;
 	public Token Args = null!;
 	public Token Index = null!;
+	public bool IsUnlimited = false; // Only for function declarations
 
 	public override string ToString(int indent) {
 		StringBuilder sb = new StringBuilder();
@@ -27,6 +28,8 @@ public class VariableToken : Token {
 			sb.Append(Args.ToString(indent + 1));
 		if (Index != null)
 			sb.Append(Index.ToString(indent + 1));
+		if (IsUnlimited)
+			sb.Append(indentSb.Append('\t').Append("...").Append('\n'));
 
 		return sb.ToString();
 	}

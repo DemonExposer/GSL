@@ -248,10 +248,17 @@ public class Parser {
 				break;
 			case VariableToken vt: {
 				if (i + 1 < line.Length)
-					if (line[i+1] is ParenthesesOperator)
-						vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-					else if (line[i + 1] is SquareBracketOperator)
-						vt.Index = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+					switch (line[i+1]) {
+						case ParenthesesOperator:
+							vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+							break;
+						case SquareBracketOperator:
+							vt.Index = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+							break;
+						case UnlimitedArgumentOperator:
+							vt.IsUnlimited = true;
+							break;
+					}
 				break;
 			}
 			case BinaryStatement statement: {
@@ -260,6 +267,7 @@ public class Parser {
 					addition = 2;
 					fs.Name = line[i + 1].Str;
 				}
+				
 				Token left = Parse(line, i + addition, lines, ref lineNo, depth + 1);
 				if (left is not ParenthesesOperator po)
 					throw new FormatException("statement condition/parameter declaration on line " + left.Line + " is missing parentheses");

@@ -15,7 +15,7 @@ public class FunctionStatement : BinaryStatement {
 	}
 	
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
-		Args = Left.Children.Cast<VariableToken>().ToList().Select(vt => new FunctionArgument {ArgType = typeof(Object), IsUnlimited = false, Name = vt.Name}).ToArray();
+		Args = Left.Children.Cast<VariableToken>().ToList().Select(vt => new FunctionArgument {ArgType = typeof(Object), IsUnlimited = vt.IsUnlimited, Name = vt.Name}).ToArray();
 		body = new FunctionBody((MultilineStatementOperator) Right);
 
 		if (vars[^1].Contains(Name))
