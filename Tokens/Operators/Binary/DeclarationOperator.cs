@@ -1,3 +1,4 @@
+using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
@@ -15,7 +16,7 @@ public class DeclarationOperator : BinaryOperator {
 			throw new InvalidOperationException(((VariableToken) Left).Name + " is already defined");
 		} catch (KeyNotFoundException) { }
 		
-		Object res = new Integer(0); // TODO: Make this default to null instead of 0
+		Object res = new Null();
 		vars[^1][((VariableToken) Left).Name] = res;
 
 		if (Right is AssignmentOperator)

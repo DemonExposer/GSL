@@ -12,6 +12,7 @@ using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
+using Interpreter.Types;
 using Array = Interpreter.Types.Array;
 using String = Interpreter.Types.String;
 
@@ -109,6 +110,7 @@ public class Program {
 		vars.Insert("false", new Boolean(false));
 		vars.Insert("true", new Boolean(true));
 		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
+		vars.Insert("null", new Null());
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
