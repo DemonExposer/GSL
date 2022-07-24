@@ -1,4 +1,4 @@
-namespace Interpreter.Types; 
+namespace Interpreter.Types;
 
 /**
  * This class forces every other class that extends it to implement the ToString method

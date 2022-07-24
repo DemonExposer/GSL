@@ -11,6 +11,12 @@ public class AssignmentOperator : BinaryOperator {
 	}
 	
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
+		if (Left is DotOperator dotOp) {
+			// TODO: check whether property exists and do further checks for indexers
+			Object o = dotOp.Left.Evaluate(vars);
+			return o.Properties[dotOp.Right.Str] = Right.Evaluate(vars);
+		}
+		
 		Object leftCheck = null!;
 		int scopeIndex;
 		for (scopeIndex = vars.Count - 1; scopeIndex >= 0; scopeIndex--) try {
@@ -22,7 +28,7 @@ public class AssignmentOperator : BinaryOperator {
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + ((VariableToken) Left).Name + " does not exist");
 
 		Object res = Right.Evaluate(vars);
-		if (((VariableToken) Left).Index != null!) {
+		if (((VariableToken) Left).Index != null!) { // If the left element is indexed, resolve that index and assign to it
 			Array arr = (Array) ((VariableToken) Left).Index.Evaluate(vars);
 			if (arr.Arr.Count == 0) {
 				((Array) vars[scopeIndex][((VariableToken) Left).Name]).Arr.Add(res);

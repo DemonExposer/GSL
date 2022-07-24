@@ -1,4 +1,5 @@
 using System.Text;
+using Interpreter.Types.Comparable;
 
 namespace Interpreter.Types; 
 
@@ -7,6 +8,7 @@ public class Array : Object {
 
 	public Array(IEnumerable<Object> arr) {
 		Arr = arr.ToList();
+		Properties["x"] = new Integer(10); // Just testing, this should of course be bound to the length of Arr
 	}
 	
 	public override string ToString() {
