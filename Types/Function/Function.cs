@@ -22,12 +22,13 @@ public class Function : Object {
 			                                    Args.Length);
 
 		for (int i = 0; i < args.Length; i++) {
-			if (i >= Args.Length && !Args[^1].ArgType.IsInstanceOfType(args[i]) || !Args[i].ArgType.IsInstanceOfType(args[i]))
+			// Check if Args are same type (for an unlimited argument check the last argument of the function
+			//                              as that is the only place where unlimited args are allowed)
+			if (i >= Args.Length && !Args[^1].ArgType.IsInstanceOfType(args[i]) || i < Args.Length && !Args[i].ArgType.IsInstanceOfType(args[i]))
 				throw new InvalidOperationException("Incorrect argument type for argument " + i);
 
 			if (i >= Args.Length - 1 && Args[^1].IsUnlimited) 
-			//	vars[Args[i].Name] = someArray; // TODO: implement array type to make unlimited args an array type
-				throw new NotImplementedException("unlimited parameters are not yet implemented");
+				vars[Args[^1].Name] = new Array(args);
 			else
 				vars[Args[i].Name] = args[i];
 		}

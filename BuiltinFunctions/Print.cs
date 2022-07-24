@@ -3,6 +3,7 @@ using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types.Function;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
+using Array = Interpreter.Types.Array;
 
 namespace Interpreter.BuiltinFunctions; 
 

@@ -105,8 +105,7 @@ public class Program {
 		Priorities.Insert("decl", 11);
 		
 		// Standard defined variables
-		// TODO: Make sure print accepts an undefined number of params
-		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "arg"}}, new Print(null!)));
+		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "args", IsUnlimited = true}}, new Print(null!)));
 		vars.Insert("read", new Function(new FunctionArgument[0], new Read(null!)));
 		vars.Insert("false", new Boolean(false));
 		vars.Insert("true", new Boolean(true));
