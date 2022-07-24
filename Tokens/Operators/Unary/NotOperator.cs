@@ -4,8 +4,8 @@ using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Operators.Unary; 
 
-public class NotUnaryOperator : UnaryOperator {
-	public NotUnaryOperator() {
+public class NotOperator : UnaryOperator {
+	public NotOperator() {
 		Symbol = "!";
 	}
 	

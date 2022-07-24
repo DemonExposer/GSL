@@ -63,7 +63,7 @@ public class Program {
 		Bindings.Insert("<", typeof(SmallerBinaryOperator));
 		Bindings.Insert("<=", typeof(SmallerEqualBinaryOperator));
 		Bindings.Insert(">=", typeof(LargerEqualBinaryOperator));
-		Bindings.Insert("!", typeof(NotUnaryOperator));
+		Bindings.Insert("!", typeof(NotOperator));
 		
 		// Statements
 		Bindings.Insert("on", typeof(OnStatement));
