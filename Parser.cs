@@ -153,7 +153,7 @@ public class Parser {
 	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
-		int initialIndex = i++; // immediately increment i so that this function doesn't try to parse itself, but instead the next line
+		int initialIndex = ++i; // immediately increment i so that this function doesn't try to parse itself, but instead the next line (also fixes the error message)
 		int numBrackets = 1;
 		for (; i < lines.Length; i++) {
 			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
@@ -212,6 +212,7 @@ public class Parser {
 
 				int numBrackets = 0;
 				int j;
+				// Gets the first variable token to the right of the nearest operator
 				for (j = i; j >= 0 && line[j + 1] is not VariableToken || j == i; j--) {
 					if (Program.OpeningBrackets.Contains(line[j].Str))
 						numBrackets++;
@@ -227,6 +228,9 @@ public class Parser {
 							numBrackets--;
 					}
 				}
+
+				if (j >= 0 && line[j] is DotOperator)
+					j--;
 				
 				assOp.Left = Parse(line, j + 1, lines, ref lineNo, depth+1);
 				Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();

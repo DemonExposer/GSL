@@ -8,7 +8,7 @@ public class Array : Object {
 
 	public Array(IEnumerable<Object> arr) {
 		Arr = arr.ToList();
-		Properties["length"] = new Integer(10); // Just testing, this should of course be bound to the length of Arr
+		Properties["x"] = new Integer(10); // Just testing, this should of course be bound to the length of Arr
 	}
 	
 	public override string ToString() {
