@@ -12,7 +12,6 @@ public class Array : Object {
 	public Array(IEnumerable<Object> arr) {
 		Arr = arr.ToList();
 		Properties["length"] = new Function.Function(new FunctionArgument[0], new LengthGetter(this, null!));
-		Properties["x"] = new Integer(10); // Just testing, this should of course be bound to the length of Arr
 	}
 	
 	public override string ToString() {
