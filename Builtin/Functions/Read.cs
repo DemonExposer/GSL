@@ -4,7 +4,7 @@ using TrieDictionary;
 using Object = Interpreter.Types.Object;
 using String = Interpreter.Types.Comparable.String;
 
-namespace Interpreter.Builtin.BuiltinFunctions; 
+namespace Interpreter.Builtin.Functions; 
 
 public class Read : FunctionBody {
 	public Read(MultilineStatementOperator expressions) : base(expressions) { }

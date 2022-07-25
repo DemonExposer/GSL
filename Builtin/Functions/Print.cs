@@ -4,7 +4,7 @@ using Interpreter.Types.Function;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Builtin.BuiltinFunctions; 
+namespace Interpreter.Builtin.Functions; 
 
 public class Print : FunctionBody {
 	public Print(MultilineStatementOperator expressions) : base(expressions) { }
