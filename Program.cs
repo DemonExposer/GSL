@@ -1,4 +1,4 @@
-﻿using Interpreter.BuiltinFunctions;
+﻿using Interpreter.Builtin.Functions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
@@ -114,6 +114,7 @@ public class Program {
 		vars.Insert("true", new Boolean(true));
 		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
 		vars.Insert("null", new Null());
+		vars.Insert("File", new Builtin.Classes.File());
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {

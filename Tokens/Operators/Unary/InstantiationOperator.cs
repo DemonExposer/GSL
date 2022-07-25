@@ -1,4 +1,5 @@
 using Interpreter.Types;
+using Interpreter.Types.Util;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
@@ -11,6 +12,7 @@ public class InstantiationOperator : UnaryOperator {
 	
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		Token constructorArgs = ((VariableToken) Child).Args;
-		return ((Class) Child.Evaluate(vars)).Instantiate();
+		Object o = constructorArgs.Evaluate(vars);
+		return ((Class) Child.Evaluate(vars)).Instantiate(o is ArgumentArray aa ? aa.Arr : new [] {o});
 	}
 }
