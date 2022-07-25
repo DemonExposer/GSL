@@ -12,5 +12,6 @@ public class FunctionBody {
 			this.expressions.IsPartOfFunction = true;
 	}
 
+	// TODO: fix scopes
 	public virtual Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) => expressions.Evaluate(new List<TrieDictionary<Object>> {topScopeVars[0], vars});
 }

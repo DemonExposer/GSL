@@ -71,6 +71,7 @@ public class Program {
 		Bindings.Insert("while", typeof(WhileLoop));
 		Bindings.Insert("function", typeof(FunctionStatement));
 		Bindings.Insert("return", typeof(ReturnStatement));
+		Bindings.Insert("class", typeof(ClassStatement));
 		
 		// Separators
 		Bindings.Insert(",", typeof(CommaSeparator));
@@ -79,6 +80,7 @@ public class Program {
 		Bindings.Insert(":", typeof(ConcatenationOperator));
 		Bindings.Insert(".", typeof(DotOperator));
 		Bindings.Insert("...", typeof(UnlimitedArgumentOperator));
+		Bindings.Insert("new", typeof(InstantiationOperator));
 
 		// Low number for priority means a higher priority
 		Priorities.Insert("(", 0);
