@@ -1,0 +1,26 @@
+function abs(num) {
+	on (num < 0) {
+		return (-num)
+	}
+	
+	return (num)
+}
+
+class Point {
+	decl x = 0
+	decl y = 0
+	
+	function manhattanDistance(point) {
+		return (abs(this.x - point.x) + abs(this.y - point.y)) 
+	}
+}
+
+decl a = new Point()
+a.x = 3
+a.y = 23
+
+decl b = new Point()
+b.x = 5
+b.y = 11
+
+print(a.manhattanDistance(b))
