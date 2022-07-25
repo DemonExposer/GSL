@@ -1,11 +1,10 @@
 using System.Text;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types.Function;
-using Object = Interpreter.Types.Object;
 using TrieDictionary;
-using Array = Interpreter.Types.Array;
+using Object = Interpreter.Types.Object;
 
-namespace Interpreter.BuiltinFunctions; 
+namespace Interpreter.Builtin.BuiltinFunctions; 
 
 public class Print : FunctionBody {
 	public Print(MultilineStatementOperator expressions) : base(expressions) { }
