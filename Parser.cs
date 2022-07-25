@@ -288,12 +288,15 @@ public class Parser {
 				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
 				break;
 			}
-			case ElseStatement elseStat: {
-				Token child = CurlyBracketsParse(line, lines, ref lineNo, elseStat, depth + 1);
+			case ElseStatement or ClassStatement: {
+				if (t is ClassStatement classStat)
+					classStat.Name = line[i + 1].Str;
+				
+				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, depth + 1);
 				if (child is not MultilineStatementOperator mso)
-					throw new FormatException("else statement argument on line " + child.Line + " needs curly brackets");
+					throw new FormatException("statement argument on line " + child.Line + " needs curly brackets");
 
-				elseStat.Child = mso;
+				((UnaryStatement) t).Child = mso;
 				break;
 			}
 			case UnaryStatement unStat: {

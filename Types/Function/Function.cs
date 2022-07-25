@@ -13,6 +13,8 @@ public class Function : Object {
 
 	public Object Execute(Object[] args, List<TrieDictionary<Object>> topScopeVars) {
 		TrieDictionary<Object> vars = new TrieDictionary<Object>();
+		if (topScopeVars[^1].Contains("this"))
+			vars["this"] = topScopeVars[^1]["this"];
 
 		if (args.Length == 0 && Args.Length == 0)
 			return body.Execute(args, vars, topScopeVars);

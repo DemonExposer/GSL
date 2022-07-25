@@ -13,24 +13,26 @@ public class DotOperator : BinaryOperator {
 	}
 
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
-		 Object res = Left.Evaluate(vars).Properties[Right.Str];
+		Object leftObj = Left.Evaluate(vars);
+		Object res = leftObj.Properties[Right.Str];
 
-		 VariableToken properRight = (VariableToken) Right;
-		 if (res is Function f) {
-			 Object o = properRight.Args.Evaluate(vars);
-			 return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
-		 }
+		VariableToken properRight = (VariableToken) Right;
+		if (res is Function f) {
+			Object o = properRight.Args.Evaluate(vars);
+			vars[^1]["this"] = leftObj;
+			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
+		}
 
-		 if (res is Array a && properRight.Index != null!) {
-			 Array arr = (Array) properRight.Index.Evaluate(vars);
-			 if (arr.Arr.Count != 1 || arr.Arr[0] is not Integer)
-				 throw new FormatException("Line " + Line +  ": index must be of type Integer");
+		if (res is Array a && properRight.Index != null!) {
+			Array arr = (Array) properRight.Index.Evaluate(vars);
+			if (arr.Arr.Count != 1 || arr.Arr[0] is not Integer)
+				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
-			 Integer i = (Integer) arr.Arr[0];
-			 Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
-			 return a.Arr[index];
-		 }
+			Integer i = (Integer) arr.Arr[0];
+			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
+			return a.Arr[index];
+		}
 
-		 return res;
+		return res;
 	}
 }
