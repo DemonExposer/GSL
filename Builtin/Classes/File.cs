@@ -1,4 +1,3 @@
-using System.Text;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types;
 using Interpreter.Types.Function;
@@ -12,6 +11,7 @@ namespace Interpreter.Builtin.Classes;
 public class File : Class {
 	private ReadBody rb;
 	private WriteBody wb;
+	private AppendBody ab;
 	
 	public File() {
 		Name = "File";
@@ -19,6 +19,8 @@ public class File : Class {
 		ClassProperties["readAll"] = new Function(new FunctionArgument[0], rb);
 		wb = new WriteBody(null!);
 		ClassProperties["write"] = new Function(new [] {new FunctionArgument {ArgType = typeof(String), Name = "data"}}, wb);
+		ab = new AppendBody(null!);
+		ClassProperties["append"] = new Function(new[] {new FunctionArgument {ArgType = typeof(String), Name = "data"}}, ab);
 	}
 
 	public override Object Instantiate(params Object[] args) {
@@ -26,7 +28,7 @@ public class File : Class {
 			throw new ArgumentException("File constructor takes 1 argument, " + args.Length + " were given");
 
 		string fileName = ((String) args[0]).Str;
-		wb.FileName = rb.FileName = fileName;
+		wb.FileName = rb.FileName = ab.FileName = fileName;
 		return new Instance {ClassType = this, Properties = ClassProperties};
 	}
 
@@ -51,6 +53,19 @@ public class File : Class {
 
 		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
 			FileStream fs = System.IO.File.Open(FileName, FileMode.OpenOrCreate);
+			fs.Write(Default.GetBytes(((String) args[0]).Str));
+			fs.Close();
+			return null!;
+		}
+	}
+
+	private class AppendBody : FunctionBody {
+		public string FileName = null!;
+		
+		public AppendBody(MultilineStatementOperator expressions) : base(expressions) { }
+
+		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
+			FileStream fs = System.IO.File.Open(FileName, FileMode.Append);
 			fs.Write(Default.GetBytes(((String) args[0]).Str));
 			fs.Close();
 			return null!;
