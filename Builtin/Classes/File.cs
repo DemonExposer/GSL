@@ -25,30 +25,35 @@ public class File : Class {
 		if (args.Length != 1)
 			throw new ArgumentException("File constructor takes 1 argument, " + args.Length + " were given");
 
-		rb.Fs = System.IO.File.Open(((String) args[0]).Str, FileMode.OpenOrCreate);
-		wb.Fs = rb.Fs;
+		string fileName = ((String) args[0]).Str;
+		wb.FileName = rb.FileName = fileName;
 		return new Instance {ClassType = this, Properties = ClassProperties};
 	}
 
 	private class ReadBody : FunctionBody {
-		public FileStream Fs = null!;
+		public string FileName = null!;
 		
 		public ReadBody(MultilineStatementOperator expressions) : base(expressions) { }
 
 		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
-			byte[] buffer = new byte[Fs.Length];
-			Fs.Read(buffer, 0, (int) Fs.Length);
+			FileStream fs = System.IO.File.Open(FileName, FileMode.OpenOrCreate);
+			byte[] buffer = new byte[fs.Length];
+			fs.Read(buffer, 0, (int) fs.Length);
+			fs.Close();
 			return new String(Default.GetString(buffer));
 		}
 	}
 
 	private class WriteBody : FunctionBody {
-		public FileStream Fs = null!;
+		public string FileName = null!;
 		
 		public WriteBody(MultilineStatementOperator expressions) : base(expressions) { }
 
 		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
-			throw new NotImplementedException();
+			FileStream fs = System.IO.File.Open(FileName, FileMode.OpenOrCreate);
+			fs.Write(Default.GetBytes(((String) args[0]).Str));
+			fs.Close();
+			return null!;
 		}
 	}
 }
