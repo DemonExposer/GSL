@@ -45,7 +45,7 @@ public class VariableToken : Token {
 		if (res == null!)
 			throw new KeyNotFoundException("Line " + Line + ": Variable " + Name + " does not exist");
 
-		if (res is Function f) {
+		if (res is Function f && Args != null!) {
 			Object o = Args.Evaluate(vars);
 			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
 		}
