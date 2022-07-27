@@ -10,6 +10,7 @@ public class String : Comparable {
 	public String(string s) {
 		Str = s;
 		Properties["length"] = new Function.Function(new FunctionArgument[0], new LengthGetter(this, null!));
+		Properties["toInteger"] = new Function.Function(new FunctionArgument[0], new ToInteger(this, null!));
 	}
 
 	public override string ToString() => Str;
@@ -31,5 +32,15 @@ public class String : Comparable {
 		}
 
 		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) => new Integer(context.Str.Length);
+	}
+	
+	private class ToInteger : FunctionBody {
+		private String context;
+		
+		public ToInteger(String context, MultilineStatementOperator expressions) : base(expressions) {
+			this.context = context;
+		}
+
+		public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) => new Integer(Int32.Parse(context.Str));
 	}
 }
