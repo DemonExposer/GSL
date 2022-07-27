@@ -11,7 +11,7 @@ using String = Interpreter.Types.Comparable.String;
 namespace Interpreter.Builtin.Classes; 
 
 public class File : Class {
-	private FileBody read, write, append, exists;
+	private FileBody read, write, append, exists, delete;
 	private delegate Object FileAction(string fileName, Object[] args);
 	
 	public File() {
@@ -48,6 +48,13 @@ public class File : Class {
 		exists = new FileBody(null!);
 		exists.Command = (fileName, _) => new Boolean(System.IO.File.Exists(fileName));
 		ClassProperties["exists"] = new Function(new FunctionArgument[0], exists);
+
+		delete = new FileBody(null!);
+		delete.Command = (fileName, _) => {
+			System.IO.File.Delete(fileName);
+			return null!;
+		};
+		ClassProperties["delete"] = new Function(new FunctionArgument[0], delete);
 	}
 
 	public override Object Instantiate(params Object[] args) {
@@ -55,7 +62,7 @@ public class File : Class {
 			throw new ArgumentException("File constructor takes 1 argument, " + args.Length + " were given");
 
 		string fileName = ((String) args[0]).Str;
-		write.FileName = read.FileName = append.FileName = exists.FileName = fileName;
+		write.FileName = read.FileName = append.FileName = exists.FileName = delete.FileName = fileName;
 		return new Instance {ClassType = this, Properties = ClassProperties};
 	}
 
