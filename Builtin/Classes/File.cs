@@ -55,7 +55,7 @@ public class File : Class {
 			throw new ArgumentException("File constructor takes 1 argument, " + args.Length + " were given");
 
 		string fileName = ((String) args[0]).Str;
-		write.FileName = read.FileName = append.FileName = fileName;
+		write.FileName = read.FileName = append.FileName = exists.FileName = fileName;
 		return new Instance {ClassType = this, Properties = ClassProperties};
 	}
 
