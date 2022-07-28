@@ -72,6 +72,7 @@ public class Program {
 		Bindings.Insert("function", typeof(FunctionStatement));
 		Bindings.Insert("return", typeof(ReturnStatement));
 		Bindings.Insert("class", typeof(ClassStatement));
+		Bindings.Insert("require", typeof(RequireStatement));
 		
 		// Separators
 		Bindings.Insert(",", typeof(CommaSeparator));
