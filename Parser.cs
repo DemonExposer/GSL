@@ -193,7 +193,7 @@ public class Parser {
 
 		switch (t) {
 			// Check which lowest level class (i.e. most abstract), which can be parsed uniformly, the object is an instance of 
-			case ArithmeticOperator or BooleanOperator or ConcatenationOperator or DotOperator:
+			case ArithmeticOperator or BooleanOperator or ConcatenationOperator or DotOperator: // BUG: DotOperator parsing incorrect: !file.exists() gets parsed as (!file).exists() instead of !(file.exists())
 				line[i].IsDone = true;
 
 				// Parse only the appropriate section (i.e. Left should only parse to the left and Right only to the right, that's what the array slicing does)
