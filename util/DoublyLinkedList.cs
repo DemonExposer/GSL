@@ -1,4 +1,4 @@
-namespace Interpreter; 
+namespace Interpreter.util; 
 
 public class DoublyLinkedList<T> {
 	public DoublyLinkedList<T> Left = null!, Right = null!;
