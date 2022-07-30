@@ -7,6 +7,7 @@ using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
+using Interpreter.util;
 
 namespace Interpreter; 
 
@@ -58,7 +59,7 @@ public class Parser {
 	/**
 	 * This now practically just parses everything, so maybe some refactoring is needed
 	 */
-	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+	private static Token SymmetricBinaryOperatorParse(Token[] line, int i, DoublyLinkedList<string> list, ref int lineNo, int depth, bool isRightBound) {
 		int startIndex = i + (isRightBound ? 1 : -1);
 		int j = GetTopElementIndex(line, startIndex, isRightBound);
 		if (j == startIndex && !isRightBound) {
@@ -76,18 +77,18 @@ public class Parser {
 		// BinaryOperator does not exist or is already done
 		if (j < 0 || line[j].IsDone)
 			if (!isRightBound)
-				return Parse(line, j + 1, lines, ref lineNo, depth + 1);
+				return Parse(line, j + 1, list, ref lineNo, depth + 1);
 			else
-				return Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				return Parse(line, i + 1, list, ref lineNo, depth + 1);
 
 		// BinaryOperator does exist and is not done, parse it
-		return Parse(line, j, lines, ref lineNo, depth + 1);
+		return Parse(line, j, list, ref lineNo, depth + 1);
 	}
 
 	/**
 	 * Removes brackets and parses inside expression(s) by identifying the top operator and calling Parse
 	 */
-	private static Token[] BracketsParse(Token[] line, int i, string[] lines, ref int lineNo, int depth, bool isRightBound) {
+	private static Token[] BracketsParse(Token[] line, int i, DoublyLinkedList<string> list, ref int lineNo, int depth, bool isRightBound) {
 		List<Token[]> arguments = new List<Token[]>();
 		List<Token> subLine = new List<Token>();
 		int numBrackets = 0;
@@ -136,7 +137,7 @@ public class Parser {
 		// Parse each element in the brackets and put it in a new list
 		List<Token> properArguments = new List<Token>();
 		for (int j = 0; j < arguments.Count; j++)
-			properArguments.Add(Parse(arguments[j], GetTopElementIndex(arguments[j].ToArray(), 0, isRightBound), lines, ref lineNo, depth + 1));
+			properArguments.Add(Parse(arguments[j], GetTopElementIndex(arguments[j].ToArray(), 0, isRightBound), list, ref lineNo, depth + 1));
 		
 		return properArguments.ToArray();
 	}
@@ -144,13 +145,14 @@ public class Parser {
 	/**
 	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
 	 */
-	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, DoublyLinkedList<string> list, ref int i, Token parent, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
-		int initialIndex = ++i; // immediately increment i so that this function doesn't try to parse itself, but instead the next line (also fixes the error message)
+		int initialIndex = ++i; // immediately increment i to fix the error messages (i.e. indicating the right line)
 		int numBrackets = 1;
-		for (; i < lines.Length; i++) {
-			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
+		list = list.Right; // go to next line so that this function doesn't try to parse itself
+		for (; list != null!; i++, list = list.Right) {
+			CheckedString[] lexedLine = Lexer.Lex(list.Value!, i + 1);
 
 			lexedLine = CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
@@ -159,7 +161,7 @@ public class Parser {
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 			int before = i;
-			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
+			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), list, ref i, depth + 1));
 
 			if (i != before)
 				continue;
@@ -172,7 +174,7 @@ public class Parser {
 
 				if (numBrackets == 0) {
 					if (parent is OnStatement onStat && tokenizedLine.Length > 1 && tokenizedLine[1] is ElseStatement)
-						onStat.ElseChild = (ElseStatement) Parse(tokenizedLine, 1, lines, ref i, depth + 1);
+						onStat.ElseChild = (ElseStatement) Parse(tokenizedLine, 1, list, ref i, depth + 1);
 					
 					goto FullBreak;
 				}
@@ -180,7 +182,7 @@ public class Parser {
 		}
 		FullBreak:
 		
-		if (i >= lines.Length)
+		if (list == null)
 			throw new FormatException("no matched bracket for bracket on line " + initialIndex);
 
 		((MultilineStatementOperator) line[^1]).Children = tokens.ToArray();
@@ -188,7 +190,7 @@ public class Parser {
 		return (MultilineStatementOperator) line[^1];
 	}
 	
-	public static Token Parse(Token[] line, int i, string[] lines, ref int lineNo, int depth) {
+	public static Token Parse(Token[] line, int i, DoublyLinkedList<string> list, ref int lineNo, int depth) {
 		Token t = line[i];
 
 		switch (t) {
@@ -197,14 +199,14 @@ public class Parser {
 				line[i].IsDone = true;
 
 				// Parse only the appropriate section (i.e. Left should only parse to the left and Right only to the right, that's what the array slicing does)
-				((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, lines, ref lineNo, depth + 1, false);
-				((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, lines, ref lineNo, depth + 1, true);
+				((BinaryOperator) t).Left = SymmetricBinaryOperatorParse(line.Take(i+1).ToArray(), i, list, ref lineNo, depth + 1, false);
+				((BinaryOperator) t).Right = SymmetricBinaryOperatorParse(new ArraySegment<Token>(line, i, line.Length - i).ToArray(), 0, list, ref lineNo, depth + 1, true);
 				break;
 			case DeclarationOperator decOp: {
-				decOp.Left = Parse(line, i + 1, lines, ref lineNo, depth+1);
+				decOp.Left = Parse(line, i + 1, list, ref lineNo, depth+1);
 			
 				if (i + 2 < line.Length) // Only Parse right hand side if it exists
-					decOp.Right = Parse(line, i + 2, lines, ref lineNo, depth + 1);
+					decOp.Right = Parse(line, i + 2, list, ref lineNo, depth + 1);
 				break;
 			}
 			case AssignmentOperator assOp: {
@@ -232,28 +234,28 @@ public class Parser {
 				if (j >= 0 && line[j] is DotOperator)
 					j--;
 				
-				assOp.Left = Parse(line, j + 1, lines, ref lineNo, depth+1);
+				assOp.Left = Parse(line, j + 1, list, ref lineNo, depth+1);
 				Token[] subLine = new ArraySegment<Token>(line, i, line.Length - i).ToArray();
-				assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), lines, ref lineNo, depth+1);
+				assOp.Right = Parse(subLine, GetTopElementIndex(subLine, 1, true), list, ref lineNo, depth+1);
 				break;
 			}
 			case ParenthesesOperator parOp:
-				parOp.Children = BracketsParse(line, i, lines, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
+				parOp.Children = BracketsParse(line, i, list, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
 				break;
 			case SquareBracketOperator sqOp:
-				sqOp.Children = BracketsParse(line, i, lines, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
+				sqOp.Children = BracketsParse(line, i, list, ref lineNo, depth + 1, Program.OpeningBrackets.Contains(line[i].Str));
 				break;
 			case UnaryOperator unOp:
-				unOp.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				unOp.Child = Parse(line, i + 1, list, ref lineNo, depth + 1);
 				break;
 			case VariableToken vt: {
 				if (i + 1 < line.Length)
 					switch (line[i+1]) {
 						case ParenthesesOperator:
-							vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+							vt.Args = Parse(line, i + 1, list, ref lineNo, depth + 1);
 							break;
 						case SquareBracketOperator:
-							vt.Index = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+							vt.Index = Parse(line, i + 1, list, ref lineNo, depth + 1);
 							break;
 						case UnlimitedArgumentOperator:
 							vt.IsUnlimited = true;
@@ -268,7 +270,7 @@ public class Parser {
 					fs.Name = line[i + 1].Str;
 				}
 				
-				Token left = Parse(line, i + addition, lines, ref lineNo, depth + 1);
+				Token left = Parse(line, i + addition, list, ref lineNo, depth + 1);
 				if (left is not ParenthesesOperator po)
 					throw new FormatException("statement condition/parameter declaration on line " + left.Line + " is missing parentheses");
 			
@@ -285,18 +287,20 @@ public class Parser {
 					j++;
 				} while (numBrackets != 0);
 			
-				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
+				statement.Right = CurlyBracketsParse(line, list, ref lineNo, statement, depth + 1);
 				break;
 			}
 			case RequireStatement reqStat: {
-				reqStat.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				reqStat.Child = Parse(line, i + 1, list, ref lineNo, depth + 1);
+				reqStat.Insert(list);
+				lineNo--;
 				break;
 			}
 			case ElseStatement or ClassStatement: {
 				if (t is ClassStatement classStat)
 					classStat.Name = line[i + 1].Str;
 				
-				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, depth + 1);
+				Token child = CurlyBracketsParse(line, list, ref lineNo, t, depth + 1);
 				if (child is not MultilineStatementOperator mso)
 					throw new FormatException("statement argument on line " + child.Line + " needs curly brackets");
 
@@ -304,7 +308,7 @@ public class Parser {
 				break;
 			}
 			case UnaryStatement unStat: {
-				Token child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				Token child = Parse(line, i + 1, list, ref lineNo, depth + 1);
 				if (child is not ParenthesesOperator po)
 					throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
 
