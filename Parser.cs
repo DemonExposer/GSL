@@ -163,8 +163,11 @@ public class Parser {
 			int before = i;
 			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), list, ref i, depth + 1));
 
-			if (i != before)
+			if (i != before) {
+				for (; before < i; before++)
+					list = list.Right;
 				continue;
+			}
 
 			foreach (CheckedString cs in lexedLine) {
 				if (cs.Str == "}")
