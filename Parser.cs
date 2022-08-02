@@ -140,15 +140,14 @@ public class Parser {
 		
 		return properArguments.ToArray();
 	}
-
-	/**
-	 * Note that this is a bad implementation with too strict constraints, but for now, only functionality is important
-	 */
+	
 	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
 		int numBrackets = 1;
+		bool isFirstBracketFound = false;
+		MultilineStatementOperator firstFoundBracket = null!;
 		for (; i < lines.Length; i++) {
 			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
 
@@ -159,24 +158,32 @@ public class Parser {
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 			int before = i;
-
-			if (i == initialIndex) {
+			bool doContinue = false;
+			if (!isFirstBracketFound) {
+				doContinue = true;
 				for (int j = 0; j < tokenizedLine.Length; j++) {
-					if (tokenizedLine[j] is MultilineStatementOperator) {
+					if (tokenizedLine[j] is MultilineStatementOperator mso) {
+						isFirstBracketFound = true;
+						firstFoundBracket = mso;
 						tokenizedLine = new ArraySegment<Token>(tokenizedLine, j + 1, tokenizedLine.Length - (j + 1)).ToArray();
+						doContinue = tokenizedLine.Length == 0; // Happens if first line of declaration ends with an opening curly bracket
 						break;
 					}
 				}
 			}
-			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
 
+			if (doContinue) // Happens for before mentioned case and if no curly bracket is found at all
+				continue;
+
+			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
+			
 			if (i != before)
 				continue;
 
-			foreach (CheckedString cs in lexedLine) {
-				if (cs.Str == "}")
+			foreach (Token t in tokenizedLine) {
+				if (t.Str == "}")
 					numBrackets--;
-				else if (cs.Str == "{")
+				else if (t.Str == "{")
 					numBrackets++;
 
 				if (numBrackets == 0) {
@@ -192,9 +199,9 @@ public class Parser {
 		if (i >= lines.Length)
 			throw new FormatException("no matched bracket for bracket on line " + (initialIndex + 1));
 
-		((MultilineStatementOperator) line[^1]).Children = tokens.ToArray();
+		firstFoundBracket.Children = tokens.ToArray();
 
-		return (MultilineStatementOperator) line[^1];
+		return firstFoundBracket;
 	}
 	
 	public static Token Parse(Token[] line, int i, string[] lines, ref int lineNo, int depth) {
