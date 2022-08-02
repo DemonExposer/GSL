@@ -147,7 +147,7 @@ public class Parser {
 	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
-		int initialIndex = ++i; // immediately increment i so that this function doesn't try to parse itself, but instead the next line (also fixes the error message)
+		int initialIndex = i;
 		int numBrackets = 1;
 		for (; i < lines.Length; i++) {
 			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
@@ -159,6 +159,15 @@ public class Parser {
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 			int before = i;
+
+			if (i == initialIndex) {
+				for (int j = 0; j < tokenizedLine.Length; j++) {
+					if (tokenizedLine[j] is MultilineStatementOperator) {
+						tokenizedLine = new ArraySegment<Token>(tokenizedLine, j + 1, tokenizedLine.Length - (j + 1)).ToArray();
+						break;
+					}
+				}
+			}
 			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
 
 			if (i != before)
@@ -181,7 +190,7 @@ public class Parser {
 		FullBreak:
 		
 		if (i >= lines.Length)
-			throw new FormatException("no matched bracket for bracket on line " + initialIndex);
+			throw new FormatException("no matched bracket for bracket on line " + (initialIndex + 1));
 
 		((MultilineStatementOperator) line[^1]).Children = tokens.ToArray();
 
