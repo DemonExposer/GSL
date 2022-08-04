@@ -12,7 +12,7 @@ namespace Interpreter;
 
 public class Parser {
 	public static int GetTopElementIndex(Token[] line, int startIndex, bool isRightBound) {
-		if (line[startIndex] is BinaryStatement)
+		if (line[startIndex] is BinaryStatement or MultilineStatementOperator)
 			return startIndex;
 	
 		int highestPriorityNum = -1;
@@ -321,6 +321,14 @@ public class Parser {
 					throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
 
 				unStat.Child = po;
+				break;
+			}
+			case MultilineStatementOperator mso: {
+				if (mso.Str == "}")
+					break;
+
+				// TODO: fix this weird property copying and add this to statement parsing and also fix parsing for simple objects
+				mso.Children = CurlyBracketsParse(line, lines, ref lineNo, mso, depth + 1).Children;
 				break;
 			}
 		}
