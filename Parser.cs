@@ -141,7 +141,7 @@ public class Parser {
 		return properArguments.ToArray();
 	}
 	
-	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, bool isObject, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
@@ -301,14 +301,14 @@ public class Parser {
 					j++;
 				} while (numBrackets != 0);
 			
-				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
+				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, false, depth + 1);
 				break;
 			}
 			case ElseStatement or ClassStatement: {
 				if (t is ClassStatement classStat)
 					classStat.Name = line[i + 1].Str;
 				
-				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, depth + 1);
+				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, false, depth + 1);
 				if (child is not MultilineStatementOperator mso)
 					throw new FormatException("statement argument on line " + child.Line + " needs curly brackets");
 
@@ -328,7 +328,7 @@ public class Parser {
 					break;
 
 				// TODO: fix this weird property copying and add this to statement parsing and also fix parsing for simple objects
-				mso.Children = CurlyBracketsParse(line, lines, ref lineNo, mso, depth + 1).Children;
+				mso.Children = CurlyBracketsParse(line, lines, ref lineNo, mso, true, depth + 1).Children;
 				break;
 			}
 		}
