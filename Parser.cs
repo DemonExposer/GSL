@@ -141,7 +141,7 @@ public class Parser {
 		return properArguments.ToArray();
 	}
 	
-	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, bool isObject, int depth) {
+	private static MultilineStatementOperator CurlyBracketsParse(Token[] line, string[] lines, ref int i, Token parent, int depth) {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
@@ -192,6 +192,66 @@ public class Parser {
 					
 					goto FullBreak;
 				}
+			}
+		}
+		FullBreak:
+		
+		if (i >= lines.Length)
+			throw new FormatException("no matched bracket for bracket on line " + (initialIndex + 1));
+
+		firstFoundBracket.Children = tokens.ToArray();
+
+		return firstFoundBracket;
+	}
+
+	private static MultilineStatementOperator SimpleObjectParse(Token[] line, string[] lines, ref int i, int depth) {
+		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
+		List<Token> tokens = new List<Token>();
+		int initialIndex = i;
+		int numBrackets = 1;
+		bool isFirstBracketFound = false;
+		MultilineStatementOperator firstFoundBracket = null!;
+		for (; i < lines.Length; i++) {
+			// TODO: Match <key>: <expression>
+			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
+
+			lexedLine = CheckComment(lexedLine);
+			if (lexedLine.Length == 0)
+				continue;
+
+			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+
+			int before = i;
+			bool doContinue = false;
+			if (!isFirstBracketFound) {
+				doContinue = true;
+				for (int j = 0; j < tokenizedLine.Length; j++) {
+					if (tokenizedLine[j] is MultilineStatementOperator mso) {
+						isFirstBracketFound = true;
+						firstFoundBracket = mso;
+						tokenizedLine = new ArraySegment<Token>(tokenizedLine, j + 1, tokenizedLine.Length - (j + 1)).ToArray();
+						doContinue = tokenizedLine.Length == 0; // Happens if first line of declaration ends with an opening curly bracket
+						break;
+					}
+				}
+			}
+
+			if (doContinue) // Happens for before mentioned case and if no curly bracket is found at all
+				continue;
+
+			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
+			
+			if (i != before)
+				continue;
+
+			foreach (Token t in tokenizedLine) {
+				if (t.Str == "}")
+					numBrackets--;
+				else if (t.Str == "{")
+					numBrackets++;
+
+				if (numBrackets == 0)
+					goto FullBreak;
 			}
 		}
 		FullBreak:
@@ -301,14 +361,14 @@ public class Parser {
 					j++;
 				} while (numBrackets != 0);
 			
-				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, false, depth + 1);
+				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
 				break;
 			}
 			case ElseStatement or ClassStatement: {
 				if (t is ClassStatement classStat)
 					classStat.Name = line[i + 1].Str;
 				
-				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, false, depth + 1);
+				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, depth + 1);
 				if (child is not MultilineStatementOperator mso)
 					throw new FormatException("statement argument on line " + child.Line + " needs curly brackets");
 
@@ -328,7 +388,7 @@ public class Parser {
 					break;
 
 				// TODO: fix this weird property copying and add this to statement parsing and also fix parsing for simple objects
-				mso.Children = CurlyBracketsParse(line, lines, ref lineNo, mso, true, depth + 1).Children;
+				mso.Children = SimpleObjectParse(line, lines, ref lineNo, depth + 1).Children;
 				break;
 			}
 		}
