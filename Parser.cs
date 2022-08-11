@@ -157,6 +157,7 @@ public class Parser {
 
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
+			// Find first curly bracket
 			int before = i;
 			bool doContinue = false;
 			if (!isFirstBracketFound) {
@@ -208,9 +209,11 @@ public class Parser {
 		// Get copy of vars so that it doesn't get affected by method calls lower in the recursion tree
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
-		int numBrackets = 1;
+		int numBrackets = 0;
 		bool isFirstBracketFound = false;
 		MultilineStatementOperator firstFoundBracket = null!;
+		List<Token[]> properLines = new List<Token[]>();
+		List<Token> subLine = new List<Token>();
 		for (; i < lines.Length; i++) {
 			// TODO: Match <key>: <expression>
 			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
@@ -220,7 +223,38 @@ public class Parser {
 				continue;
 
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
+			
+			foreach (Token t in tokenizedLine) {
+				if (t.Str == "}")
+					numBrackets--;
+				else if (t.Str == "{") {
+					if (!isFirstBracketFound) {
+						isFirstBracketFound = true;
+						numBrackets++;
+						continue;
+					}
+					numBrackets++;
+				}
 
+				if (!isFirstBracketFound)
+					continue;
+				
+				if (t is CommaSeparator && numBrackets == 1) {
+					properLines.Add(subLine.ToArray());
+					subLine = new List<Token>();
+					continue;
+				}
+
+				if (numBrackets == 0) {
+					properLines.Add(subLine.ToArray());
+					goto FullBreak;
+				}
+				
+				subLine.Add(t);
+			}
+			continue;
+
+			// Find first curly bracket
 			int before = i;
 			bool doContinue = false;
 			if (!isFirstBracketFound) {
@@ -238,6 +272,12 @@ public class Parser {
 
 			if (doContinue) // Happens for before mentioned case and if no curly bracket is found at all
 				continue;
+			
+			if (tokenizedLine[0] is not MultilineStatementOperator && (tokenizedLine[0] is not StringToken || tokenizedLine[1] is not ConcatenationOperator))
+				throw new FormatException("Line " + (i+1));
+
+			if (tokenizedLine[0] is not MultilineStatementOperator)
+				tokenizedLine = new ArraySegment<Token>(tokenizedLine, 2, tokenizedLine.Length - 2).ToArray();
 
 			tokens.Add(Parse(tokenizedLine, GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, depth + 1));
 			
@@ -255,7 +295,7 @@ public class Parser {
 			}
 		}
 		FullBreak:
-		
+
 		if (i >= lines.Length)
 			throw new FormatException("no matched bracket for bracket on line " + (initialIndex + 1));
 
