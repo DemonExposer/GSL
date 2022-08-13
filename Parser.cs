@@ -263,7 +263,6 @@ public class Parser {
 				throw new FormatException("simple objects should only consist of declarations");
 
 			Token[] parseLine = new ArraySegment<Token>(properLine, 2, properLine.Length - 2).ToArray();
-			// TODO: add this as value and the key as key to the properties of the object, also, create an object
 			ObjectAssignmentOperator objAssOp = new ObjectAssignmentOperator();
 			objAssOp.Left = properLine[0];
 			objAssOp.Right = Parse(parseLine, GetTopElementIndex(parseLine, 0, true), lines, ref i, depth + 1);
