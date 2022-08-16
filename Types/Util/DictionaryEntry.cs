@@ -1,5 +1,6 @@
-﻿namespace Interpreter.Types.Util;
-using String = Comparable.String;
+﻿using String = Interpreter.Types.Comparable.String;
+
+namespace Interpreter.Types.Util;
 
 public class DictionaryEntry : Object {
 	public String Key;
