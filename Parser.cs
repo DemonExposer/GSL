@@ -204,7 +204,7 @@ public class Parser {
 		return firstFoundBracket;
 	}
 
-	private static ObjectAssignmentOperator[] SimpleObjectParse(Token[] line, string[] lines, ref int i, int startIndex, int depth) {
+	private static DictionaryAssignmentOperator[] SimpleObjectParse(Token[] line, string[] lines, ref int i, int startIndex, int depth) {
 		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
 		int numBrackets = 0;
@@ -256,14 +256,14 @@ public class Parser {
 		}
 		FullBreak:
 
-		List<ObjectAssignmentOperator> objectBody = new List<ObjectAssignmentOperator>();
+		List<DictionaryAssignmentOperator> objectBody = new List<DictionaryAssignmentOperator>();
 		foreach (Token[] properLine in properLines) {
 			// TODO: fix the ConcatenationOperator thing, because right here it's not performing concatenation
 			if (properLine[0] is not StringToken || properLine[1] is not ConcatenationOperator)
 				throw new FormatException("simple objects should only consist of declarations");
 
 			Token[] parseLine = new ArraySegment<Token>(properLine, 2, properLine.Length - 2).ToArray();
-			ObjectAssignmentOperator objAssOp = new ObjectAssignmentOperator();
+			DictionaryAssignmentOperator objAssOp = new DictionaryAssignmentOperator();
 			objAssOp.Left = properLine[0];
 			objAssOp.Right = Parse(parseLine, GetTopElementIndex(parseLine, 0, true), lines, ref i, depth + 1);
 			objectBody.Add(objAssOp);
@@ -394,11 +394,12 @@ public class Parser {
 				unStat.Child = po;
 				break;
 			}
-			case MultilineStatementOperator mso: {
+			case MultilineStatementOperator mso: { // TODO: fix parsing of nested dictionaries
 				if (mso.Str == "}")
 					break;
 
 				mso.Children = SimpleObjectParse(line, lines, ref lineNo, i, depth + 1);
+				mso.IsDictionary = true;
 				break;
 			}
 		}
