@@ -205,15 +205,16 @@ public class Parser {
 	}
 
 	private static DictionaryAssignmentOperator[] SimpleObjectParse(Token[] line, string[] lines, ref int i, int startIndex, int depth) {
-		List<Token> tokens = new List<Token>();
 		int initialIndex = i;
 		int numBrackets = 0;
 		List<Token[]> properLines = new List<Token[]>();
 		List<Token> subLine = new List<Token>();
 		for (; i < lines.Length; i++) {
 			Token[] tokenizedLine;
+			int j = 0;
 			if (i == initialIndex) {
 				tokenizedLine = line;
+				j = startIndex;
 			} else {
 				CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
 
@@ -224,10 +225,7 @@ public class Parser {
 				tokenizedLine = Tokenizer.Tokenize(lexedLine);
 			}
 
-			for (int j = 0; j < tokenizedLine.Length; j++) {
-				if (i == initialIndex)
-					j = startIndex;
-
+			for (; j < tokenizedLine.Length; j++) {
 				Token t = tokenizedLine[j];
 				if (t.Str == "}")
 					numBrackets--;
@@ -252,7 +250,6 @@ public class Parser {
 
 				subLine.Add(t);
 			}
-
 		}
 		FullBreak:
 
@@ -398,6 +395,8 @@ public class Parser {
 				if (mso.Str == "}")
 					break;
 
+				// If for some reason the Token[] is changed within mso and an element is replaced by a type
+				// which is not a subclass or superclass of DictionaryAssignmentOperator, the program will error, but that should never happen
 				mso.Children = SimpleObjectParse(line, lines, ref lineNo, i, depth + 1);
 				mso.IsDictionary = true;
 				break;
