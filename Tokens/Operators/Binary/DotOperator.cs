@@ -1,6 +1,7 @@
 using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
 using Interpreter.Types.Util;
+using Interpreter.Types;
 using TrieDictionary;
 using Array = Interpreter.Types.Array;
 using Object = Interpreter.Types.Object;
@@ -14,7 +15,7 @@ public class DotOperator : BinaryOperator {
 
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		Object leftObj = Left.Evaluate(vars);
-		Object res = leftObj.Properties[Right.Str];
+		Object res = leftObj.Properties.Contains(Right.Str) ? leftObj.Properties[Right.Str] : new Null();
 
 		VariableToken properRight = (VariableToken) Right;
 		if (res is Function f) {
