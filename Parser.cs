@@ -372,11 +372,10 @@ public class Parser {
 				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
 				break;
 			}
-			case RequireStatement reqStat: {
+			case RequireStatement reqStat:
 				reqStat.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-				lineNo--;
+				reqStat.ParseImportFile();
 				break;
-			}
 			case ElseStatement or ClassStatement: {
 				if (t is ClassStatement classStat)
 					classStat.Name = line[i + 1].Str;

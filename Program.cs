@@ -23,7 +23,7 @@ public class Program {
 	public static TrieDictionary<int> Priorities = new ();
 	public static List<string> OpeningBrackets = new ();
 	public static List<string> ClosingBrackets = new ();
-	private static TrieDictionary<Object> vars = new ();
+	public static TrieDictionary<Object> Vars = new ();
 
 	public static void Main(string[] args) {
 		// Arithmetic
@@ -109,13 +109,13 @@ public class Program {
 		Priorities.Insert("decl", 11);
 		
 		// Standard defined variables
-		vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "args", IsUnlimited = true}}, new Print(null!)));
-		vars.Insert("read", new Function(new FunctionArgument[0], new Read(null!)));
-		vars.Insert("false", new Boolean(false));
-		vars.Insert("true", new Boolean(true));
-		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
-		vars.Insert("null", new Null());
-		vars.Insert("File", new Builtin.Classes.File());
+		Vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "args", IsUnlimited = true}}, new Print(null!)));
+		Vars.Insert("read", new Function(new FunctionArgument[0], new Read(null!)));
+		Vars.Insert("false", new Boolean(false));
+		Vars.Insert("true", new Boolean(true));
+		Vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
+		Vars.Insert("null", new Null());
+		Vars.Insert("File", new Builtin.Classes.File());
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
@@ -137,7 +137,7 @@ public class Program {
 			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, 0);
 
 		//	Console.WriteLine(tree.ToString(0));
-			tree.Evaluate(new List<TrieDictionary<Object>> {vars});
+			tree.Evaluate(new List<TrieDictionary<Object>> {Vars});
 		}
 	}
 }
