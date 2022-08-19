@@ -374,7 +374,6 @@ public class Parser {
 			}
 			case RequireStatement reqStat: {
 				reqStat.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-				reqStat.Insert(lines);
 				lineNo--;
 				break;
 			}

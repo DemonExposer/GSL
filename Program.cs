@@ -13,7 +13,6 @@ using Interpreter.Tokens.Separators;
 using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
 using Interpreter.Types;
-using Interpreter.util;
 using Array = Interpreter.Types.Array;
 using String = Interpreter.Types.Comparable.String;
 
@@ -117,29 +116,26 @@ public class Program {
 		vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
 		vars.Insert("null", new Null());
 		vars.Insert("File", new Builtin.Classes.File());
-		
-		DoublyLinkedList<string> list = DoublyLinkedList<string>.FromArray(File.ReadAllLines(args[0]));
-		for (int i = 0; list != null!; list = list.Right, i++) {
-			CheckedString[] lexedLine = Lexer.Lex(list.Value!, i + 1);
+
+		string[] lines = File.ReadAllLines(args[0]);
+		for (int i = 0; i < lines.Length; i++) {
+			CheckedString[] lexedLine = Lexer.Lex(lines[i], i + 1);
 		//	foreach (CheckedString cs in lexedLine)
 		//		Console.Write("{0}, ", cs.Str);
 		//	Console.WriteLine();
 			lexedLine = Parser.CheckComment(lexedLine);
 			if (lexedLine.Length == 0)
 				continue;
-
+			
 			Token[] tokenizedLine = Tokenizer.Tokenize(lexedLine);
 
 		//	Console.Write("[");
 		//	foreach (Token t in tokenizedLine)
 		//		Console.Write("{0}, ", t.Str);
 		//	Console.WriteLine("\u0008\u0008]");
+		
+			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), lines, ref i, 0);
 
-			int j = i;
-			Token tree = Parser.Parse(tokenizedLine, Parser.GetTopElementIndex(tokenizedLine, 0, true), list, ref i, 0);
-			for (; j < i; j++) // Move to correct position when Parse has parsed multiple lines and thereby affected i
-				list = list.Right;
-			
 		//	Console.WriteLine(tree.ToString(0));
 			tree.Evaluate(new List<TrieDictionary<Object>> {vars});
 		}
