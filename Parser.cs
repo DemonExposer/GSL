@@ -332,7 +332,7 @@ public class Parser {
 				break;
 			case VariableToken vt: {
 				if (i + 1 < line.Length)
-					switch (line[i + 1]) {
+					switch (line[i+1]) {
 						case ParenthesesOperator:
 							vt.Args = Parse(line, i + 1, lines, ref lineNo, depth + 1);
 							break;
@@ -359,7 +359,7 @@ public class Parser {
 				statement.Left = po;
 
 				int numBrackets = 0;
-				int j = i + 1;
+				int j = i+1;
 				do {
 					if (Program.ClosingBrackets.Contains(line[j].Str))
 						numBrackets--;
@@ -372,6 +372,10 @@ public class Parser {
 				statement.Right = CurlyBracketsParse(line, lines, ref lineNo, statement, depth + 1);
 				break;
 			}
+			case RequireStatement reqStat:
+				reqStat.Child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
+				reqStat.ParseImportFile();
+				break;
 			case ElseStatement or ClassStatement: {
 				if (t is ClassStatement classStat)
 					classStat.Name = line[i + 1].Str;
@@ -391,7 +395,7 @@ public class Parser {
 				unStat.Child = po;
 				break;
 			}
-			case MultilineStatementOperator mso: { // TODO: fix parsing of nested dictionaries
+			case MultilineStatementOperator mso: {
 				if (mso.Str == "}")
 					break;
 

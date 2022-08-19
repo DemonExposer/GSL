@@ -1,0 +1,9 @@
+function abs(num) {
+	on (num < 0) {
+		return (-num)
+	}
+	
+	return (num)
+}
+
+export = {"abs": abs}
