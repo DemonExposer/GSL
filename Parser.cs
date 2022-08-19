@@ -396,7 +396,7 @@ public class Parser {
 				unStat.Child = po;
 				break;
 			}
-			case MultilineStatementOperator mso: { // TODO: fix parsing of nested dictionaries
+			case MultilineStatementOperator mso: {
 				if (mso.Str == "}")
 					break;
 
