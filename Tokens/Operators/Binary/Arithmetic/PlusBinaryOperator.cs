@@ -1,4 +1,3 @@
-using Interpreter.Types.Comparable;
 using Interpreter.Types.Comparable.Numbers;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;

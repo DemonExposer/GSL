@@ -4,12 +4,8 @@ using Object = Interpreter.Types.Object;
 
 namespace Interpreter.Tokens.Numbers; 
 
-public class DoubleToken : Token {
-	public Double Num = null!;
-	
-	public override string ToString(int indent) => throw new NotImplementedException();
+public class DoubleToken : NumberToken {
+	public Double D { get => (Double) Num; set => Num = value; }
 
-	public override Object Evaluate(List<TrieDictionary<Object>> vars) => throw new NotImplementedException();
-
-	public override int Size() => throw new NotImplementedException();
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => D;
 }

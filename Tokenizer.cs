@@ -29,11 +29,11 @@ public class Tokenizer {
 				res[i] = vt;
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {
 				IntegerToken nt = new IntegerToken();
-				nt.Num = new Integer(Int32.Parse(line[i].Str));
+				nt.Int = new Integer(Int32.Parse(line[i].Str));
 				res[i] = nt;
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+\\.\\d+(\\s|$)").Count == 1) {
 				DoubleToken dt = new DoubleToken();
-				dt.Num = new Double(System.Double.Parse(line[i].Str));
+				dt.D = new Double(System.Double.Parse(line[i].Str));
 				res[i] = dt;
 			} else if (Regex.Matches(line[i].Str, "\".*\"").Count == 1) {
 				StringToken st = new StringToken();

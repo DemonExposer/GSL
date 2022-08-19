@@ -2,7 +2,7 @@ namespace Interpreter.Types.Comparable.Numbers;
 
 // Imagine having a Number type like in Java. We all know who is responsible...
 public class NumberType {
-	private object num;
+	private object num = null!;
 	public object Num {
 		get => num;
 		set {
@@ -18,6 +18,10 @@ public class NumberType {
 			throw new Exception("Tried to assign invalid type to Number");
 		
 		num = o;
+	}
+
+	public NumberType() {
+		
 	}
 
 	public static NumberType operator +(NumberType a, NumberType b) {
@@ -202,15 +206,15 @@ public class NumberType {
 }
 
 public class Number : Comparable {
-	public NumberType Num = new NumberType(null!);
+	public NumberType Num = new NumberType();
 
-	public Number(object o) {
-		Num.Num = o;
+	public Number(NumberType nt) {
+		Num = nt;
 	}
 	
 	protected Number() { }
 	
-	public override string ToString() => Num.ToString()!;
+	public override string ToString() => Num.Num.ToString()!;
 
 	public override string GetType() => "Number";
 
