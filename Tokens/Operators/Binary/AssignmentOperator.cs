@@ -1,4 +1,4 @@
-using Interpreter.Types.Comparable;
+using Interpreter.Types.Comparable.Numbers;
 using Object = Interpreter.Types.Object;
 using TrieDictionary;
 using Array = Interpreter.Types.Array;
@@ -39,7 +39,7 @@ public class AssignmentOperator : BinaryOperator {
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];
-			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int;
+			Index index = (int) i.Num.Num >= 0 ? new Index((int) i.Num.Num) : ^-(int) i.Num.Num;
 			((Array) vars[scopeIndex][((VariableToken) Left).Name]).Arr[index] = res;
 		} else {
 			vars[scopeIndex][((VariableToken) Left).Name] = res;

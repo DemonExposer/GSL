@@ -1,4 +1,5 @@
 using Interpreter.Tokens.Operators.N_Ary;
+using Interpreter.Types.Comparable.Numbers;
 using Interpreter.Types.Function;
 using TrieDictionary;
 

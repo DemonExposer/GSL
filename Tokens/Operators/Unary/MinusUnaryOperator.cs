@@ -1,4 +1,4 @@
-using Interpreter.Types.Comparable;
+using Interpreter.Types.Comparable.Numbers;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
@@ -9,5 +9,5 @@ public class MinusUnaryOperator : UnaryOperator {
 		Symbol = "-";
 	}
 	
-	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Integer(-((Integer) Child.Evaluate(vars)).Int); 
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Number(-((Number) Child.Evaluate(vars)).Num); 
 }

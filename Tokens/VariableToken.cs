@@ -1,5 +1,6 @@
 using System.Text;
 using Interpreter.Types.Comparable;
+using Interpreter.Types.Comparable.Numbers;
 using Interpreter.Types.Function;
 using Interpreter.Types.Util;
 using Object = Interpreter.Types.Object;
@@ -56,7 +57,7 @@ public class VariableToken : Token {
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];
-			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
+			Index index = (int) i.Num.Num >= 0 ? new Index((int) i.Num.Num) : ^-(int) i.Num.Num; // Negative index will take nth element from the right
 			return a.Arr[index];
 		}
 

@@ -1,11 +1,12 @@
 using System.Text;
 using Interpreter.Types.Comparable;
+using Interpreter.Types.Comparable.Numbers;
 using TrieDictionary;
 using Object = Interpreter.Types.Object;
 
-namespace Interpreter.Tokens; 
+namespace Interpreter.Tokens.Numbers; 
 
-public class NumberToken : Token {
+public class IntegerToken : Token {
 	public Integer Num = null!;
 
 	public override string ToString(int indent) {
