@@ -21,9 +21,7 @@ public class NumberType {
 		num = o;
 	}
 
-	public NumberType() {
-		
-	}
+	public NumberType() { }
 
 	public static NumberType operator +(NumberType a, NumberType b) {
 		switch (a.num) {
