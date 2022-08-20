@@ -7,6 +7,7 @@ namespace Interpreter.Types.Comparable;
 
 public class String : Comparable {
 	public string Str = null!;
+	private static List<Type> parents = new List<Type>(new [] {typeof(Comparable)});
 
 	public String(string s) {
 		Str = s;

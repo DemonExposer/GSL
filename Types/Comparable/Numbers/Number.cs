@@ -4,6 +4,7 @@ namespace Interpreter.Types.Comparable.Numbers;
 
 public class Number : Comparable {
 	public NumberType Num = new NumberType();
+	private static List<Type> parents = new List<Type>(new [] {typeof(Comparable)});
 
 	public Number(NumberType nt) {
 		Num = nt;

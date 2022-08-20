@@ -9,6 +9,7 @@ namespace Interpreter.Types;
 
 public class Array : Object {
 	public List<Object> Arr;
+	private static List<Type> parents = new List<Type>(new [] {typeof(Object)});
 
 	public Array(IEnumerable<Object> arr) {
 		Arr = arr.ToList();

@@ -5,6 +5,7 @@ namespace Interpreter.Types;
 public class Class : Object {
 	public TrieDictionary<Object> ClassProperties = new TrieDictionary<Object>();
 	public string Name = null!;
+	private static List<Type> parents = new List<Type>(new [] {typeof(Object)});
 
 	public virtual Object Instantiate(params Object[] args) {
 		TrieDictionary<Object> propertiesCopy = new TrieDictionary<Object>();

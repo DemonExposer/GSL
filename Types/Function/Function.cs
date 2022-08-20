@@ -5,6 +5,7 @@ namespace Interpreter.Types.Function;
 public class Function : Object {
 	public FunctionArgument[] Args;
 	private FunctionBody body;
+	private static List<Type> parents = new List<Type>(new [] {typeof(Object)});
 
 	public Function(FunctionArgument[] args, FunctionBody body) {
 		Args = args;

@@ -3,6 +3,8 @@
 namespace Interpreter.Types;
 
 public class Dictionary : Object {
+	private static List<Type> parents = new List<Type>(new [] {typeof(Object)});
+	
 	public override string GetType() => "Dictionary";
 
 	public override string ToString() => ToString(0);

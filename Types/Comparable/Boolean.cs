@@ -2,6 +2,7 @@ namespace Interpreter.Types.Comparable;
 
 public class Boolean : Comparable {
 	public bool Bool;
+	private static List<Type> parents = new List<Type>(new [] {typeof(Comparable)});
 
 	public Boolean(bool b) {
 		Bool = b;
