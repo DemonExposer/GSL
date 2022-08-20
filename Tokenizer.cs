@@ -1,8 +1,11 @@
 using System.Data;
 using System.Text.RegularExpressions;
 using Interpreter.Tokens;
+using Interpreter.Tokens.Numbers;
 using Interpreter.Tokens.Operators.Unary;
 using Interpreter.Types.Comparable;
+using Interpreter.Types.Comparable.Numbers;
+using Double = Interpreter.Types.Comparable.Numbers.Double;
 using String = Interpreter.Types.Comparable.String;
 
 namespace Interpreter; 
@@ -25,9 +28,13 @@ public class Tokenizer {
 				vt.Name = line[i].Str;
 				res[i] = vt;
 			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+(\\s|$)").Count == 1) {
-				NumberToken nt = new NumberToken();
-				nt.Num = new Integer(Int32.Parse(line[i].Str));
+				IntegerToken nt = new IntegerToken();
+				nt.Int = new Integer(Int32.Parse(line[i].Str));
 				res[i] = nt;
+			} else if (Regex.Matches(line[i].Str, "(\\s|^)-?\\d+\\.\\d+(\\s|$)").Count == 1) {
+				DoubleToken dt = new DoubleToken();
+				dt.D = new Double(System.Double.Parse(line[i].Str));
+				res[i] = dt;
 			} else if (Regex.Matches(line[i].Str, "\".*\"").Count == 1) {
 				StringToken st = new StringToken();
 				st.StrVal = new String(line[i].Str.Substring(1, line[i].Str.Length-2));

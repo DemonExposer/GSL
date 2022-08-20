@@ -2,6 +2,7 @@ using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
 using Interpreter.Types.Util;
 using Interpreter.Types;
+using Interpreter.Types.Comparable.Numbers;
 using TrieDictionary;
 using Array = Interpreter.Types.Array;
 using Object = Interpreter.Types.Object;
@@ -30,7 +31,7 @@ public class DotOperator : BinaryOperator {
 				throw new FormatException("Line " + Line +  ": index must be of type Integer");
 
 			Integer i = (Integer) arr.Arr[0];
-			Index index = i.Int >= 0 ? new Index(i.Int) : ^-i.Int; // Negative index will take nth element from the right
+			Index index = (int) i.Num.Num >= 0 ? new Index((int) i.Num.Num) : ^-(int) i.Num.Num; // Negative index will take nth element from the right
 			return a.Arr[index];
 		}
 
