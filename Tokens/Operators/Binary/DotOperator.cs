@@ -24,6 +24,9 @@ public class DotOperator : BinaryOperator {
 			vars[^1]["this"] = leftObj;
 			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
 		}
+		
+		if (res is not Class && properRight.Args != null!)
+			throw new FormatException("Tried to call a non-function");
 
 		if (res is Array a && properRight.Index != null!) {
 			Array arr = (Array) properRight.Index.Evaluate(vars);
@@ -34,6 +37,9 @@ public class DotOperator : BinaryOperator {
 			Index index = (int) i.Num.Num >= 0 ? new Index((int) i.Num.Num) : ^-(int) i.Num.Num; // Negative index will take nth element from the right
 			return a.Arr[index];
 		}
+		
+		if (properRight.Index != null!)
+			throw new FormatException("Tried to index a non-array");
 
 		return res;
 	}

@@ -1,4 +1,5 @@
 using System.Text;
+using Interpreter.Types;
 using Interpreter.Types.Comparable;
 using Interpreter.Types.Comparable.Numbers;
 using Interpreter.Types.Function;
@@ -50,6 +51,9 @@ public class VariableToken : Token {
 			Object o = Args.Evaluate(vars);
 			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
 		}
+		
+		if (res is not Class && Args != null!)
+			throw new FormatException("Tried to call a non-function");
 
 		if (res is Array a && Index != null!) {
 			Array arr = (Array) Index.Evaluate(vars);
@@ -60,6 +64,9 @@ public class VariableToken : Token {
 			Index index = (int) i.Num.Num >= 0 ? new Index((int) i.Num.Num) : ^-(int) i.Num.Num; // Negative index will take nth element from the right
 			return a.Arr[index];
 		}
+
+		if (Index != null!)
+			throw new FormatException("Tried to index a non-array");
 
 		return res;
 	}
