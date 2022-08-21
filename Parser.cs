@@ -377,8 +377,11 @@ public class Parser {
 				reqStat.ParseImportFile();
 				break;
 			case ElseStatement or ClassStatement: {
-				if (t is ClassStatement classStat)
+				if (t is ClassStatement classStat) {
 					classStat.Name = line[i + 1].Str;
+					if (line[i + 2] is InheritsStatement)
+						classStat.Parents = (InheritsStatement) Parse(line, i + 2, lines, ref lineNo, depth + 1);
+				}
 
 				Token child = CurlyBracketsParse(line, lines, ref lineNo, t, depth + 1);
 				if (child is not MultilineStatementOperator mso)
@@ -389,7 +392,7 @@ public class Parser {
 			}
 			case UnaryStatement unStat: {
 				Token child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-				if (child is not ParenthesesOperator po)
+				if (child is not ParenthesesOperator po) // TODO: remove this condition
 					throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
 
 				unStat.Child = po;

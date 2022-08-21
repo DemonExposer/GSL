@@ -70,6 +70,7 @@ public class Program {
 		Bindings.Insert("else", typeof(ElseStatement));
 		Bindings.Insert("while", typeof(WhileLoop));
 		Bindings.Insert("function", typeof(FunctionStatement));
+		Bindings.Insert("inherits", typeof(InheritsStatement));
 		Bindings.Insert("return", typeof(ReturnStatement));
 		Bindings.Insert("class", typeof(ClassStatement));
 		Bindings.Insert("require", typeof(RequireStatement));
