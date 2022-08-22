@@ -32,7 +32,7 @@ public class Parser {
 					numBrackets--;
 			}
 
-			if (!line[i].IsDone && line[i] is BinaryOperator && Program.Priorities.Contains(line[i].Str)) {
+			if (!line[i].IsDone && line[i] is BinaryOperator or UnaryStatement && Program.Priorities.Contains(line[i].Str)) {
 				int priority = Program.Priorities[line[i].Str];
 				if (isRightBound ? priority >= highestPriorityNum : priority > highestPriorityNum) {
 					highestPriorityNum = priority;
@@ -391,11 +391,8 @@ public class Parser {
 				break;
 			}
 			case UnaryStatement unStat: {
-				Token child = Parse(line, i + 1, lines, ref lineNo, depth + 1);
-				if (child is not ParenthesesOperator po) // TODO: remove this condition
-					throw new FormatException("statement argument on line " + child.Line + " is missing parentheses");
-
-				unStat.Child = po;
+				Token[] subLine = new ArraySegment<Token>(line, i+1, line.Length - (i+1)).ToArray();
+				unStat.Child = Parse(subLine, GetTopElementIndex(subLine, 0, true), lines, ref lineNo, depth + 1);
 				break;
 			}
 			case MultilineStatementOperator mso: {

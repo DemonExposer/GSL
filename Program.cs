@@ -108,6 +108,7 @@ public class Program {
 		Priorities.Insert(":", 9);
 		Priorities.Insert("=", 10);
 		Priorities.Insert("decl", 11);
+		Priorities.Insert("return", 11);
 		
 		// Standard defined variables
 		Vars.Insert("print", new Function(new [] {new FunctionArgument {ArgType = typeof(Object), Name = "args", IsUnlimited = true}}, new Print(null!)));
