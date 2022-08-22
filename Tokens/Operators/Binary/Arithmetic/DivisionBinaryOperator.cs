@@ -10,5 +10,5 @@ public class DivisionBinaryOperator : ArithmeticOperator {
 		Symbol = "/";
 	}
 	
-	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Number(((Number) Left.Evaluate(vars)).Num / ((Number) Right.Evaluate(vars)).Num);
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => Number.GetProperInstance(((Number) Left.Evaluate(vars)).Num / ((Number) Right.Evaluate(vars)).Num);
 }

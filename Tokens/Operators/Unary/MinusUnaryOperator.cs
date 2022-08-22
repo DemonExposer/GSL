@@ -9,5 +9,5 @@ public class MinusUnaryOperator : UnaryOperator {
 		Symbol = "-";
 	}
 	
-	public override Object Evaluate(List<TrieDictionary<Object>> vars) => new Number(-((Number) Child.Evaluate(vars)).Num); 
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) => Number.GetProperInstance(-((Number) Child.Evaluate(vars)).Num); 
 }

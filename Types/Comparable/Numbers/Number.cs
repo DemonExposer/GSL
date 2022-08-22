@@ -4,12 +4,6 @@ namespace Interpreter.Types.Comparable.Numbers;
 
 public class Number : Comparable {
 	public NumberType Num = new NumberType();
-
-	public Number(NumberType nt) {
-		Num = nt;
-	}
-	
-	protected Number() { }
 	
 	public override string ToString() => Num.Num.ToString()!;
 
@@ -20,5 +14,16 @@ public class Number : Comparable {
 			throw new IncomparableException("trying to compare Integer with non-Integer");
 
 		return new Boolean(Num == n.Num);
+	}
+
+	public static Object GetProperInstance(NumberType nt) {
+		switch (nt.Num) {
+			case int i:
+				return new Integer(i);
+			case double d:
+				return new Double(d);
+		}
+
+		throw new Exception("incorrect type");
 	}
 }
