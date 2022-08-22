@@ -74,6 +74,7 @@ public class Program {
 		Bindings.Insert("return", typeof(ReturnStatement));
 		Bindings.Insert("class", typeof(ClassStatement));
 		Bindings.Insert("require", typeof(RequireStatement));
+		Bindings.Insert("override", typeof(OverrideStatement));
 		
 		// Separators
 		Bindings.Insert(",", typeof(CommaSeparator));
