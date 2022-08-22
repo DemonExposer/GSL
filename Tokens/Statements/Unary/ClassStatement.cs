@@ -17,10 +17,8 @@ public class ClassStatement : UnaryStatement {
 
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
 		List<TrieDictionary<Object>> classProperties = new List<TrieDictionary<Object>>(new [] {new TrieDictionary<Object>()});
-		((MultilineStatementOperator) Child).Evaluate(classProperties);
-
+		
 		Class res = new Class {Name = Name, ClassProperties = classProperties[0]};
-
 		if (Parents != null) {
 			Object o = Parents.Evaluate(vars);
 			if (o is ArgumentArray aa)
@@ -28,7 +26,9 @@ public class ClassStatement : UnaryStatement {
 			else
 				res.AddParent((Class) o);
 		}
-
+		
+		((MultilineStatementOperator) Child).Evaluate(classProperties);
+		
 		return vars[^1][Name] = res;
 	}
 
