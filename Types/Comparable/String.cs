@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text;
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types.Comparable.Numbers;
 using Interpreter.Types.Function;
@@ -6,7 +8,15 @@ using TrieDictionary;
 namespace Interpreter.Types.Comparable; 
 
 public class String : Comparable {
-	public string Str = null!;
+	private string str = null!;
+	public string Str { 
+		get => str;
+		set {
+			IsEscaped = false;
+			str = value;
+		}
+	}
+	public bool IsEscaped = false;
 
 	public String(string s) {
 		Str = s;
@@ -25,6 +35,44 @@ public class String : Comparable {
 			throw new IncomparableException("trying to compare String with non-String");
 
 		return new Boolean(Str == s.Str);
+	}
+
+	public void Escape() {
+		if (IsEscaped)
+			return;
+		
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < str.Length; i++) {
+			if (str[i] == '\\') { // Replace escapes
+				switch (str[i+1]) {
+					case 'n':
+						sb.Append('\n');
+						i++;
+						break;
+					case 'r':
+						sb.Append('\r');
+						i++;
+						break;
+					case 't':
+						sb.Append('\t');
+						i++;
+						break;
+					case '\\':
+						sb.Append('\\');
+						i++;
+						break;
+					case 'u':
+						sb.Append((char) Int32.Parse(str.Substring(i + 2, 4), NumberStyles.HexNumber));
+						i += 5;
+						break;
+				}
+			} else {
+				sb.Append(str[i]);
+			}
+		}
+
+		str = sb.ToString();
+		IsEscaped = true;
 	}
 
 	private class LengthGetter : FunctionBody {

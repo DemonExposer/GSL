@@ -21,7 +21,10 @@ public class StringToken : Token {
 		return sb.ToString();
 	}
 
-	public override Object Evaluate(List<TrieDictionary<Object>> vars) => StrVal;
+	public override Object Evaluate(List<TrieDictionary<Object>> vars) {
+		StrVal.Escape();
+		return StrVal;
+	}
 
 	public override int Size() => 1;
 }
