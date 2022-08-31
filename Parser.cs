@@ -162,7 +162,7 @@ public class Parser {
 			if (!isFirstBracketFound) {
 				doContinue = true;
 				for (int j = 0; j < tokenizedLine.Length; j++) {
-					if (tokenizedLine[j] is MultilineStatementOperator mso) {
+					if (tokenizedLine[j] is MultilineStatementOperator {Str: "{"} mso) {
 						isFirstBracketFound = true;
 						firstFoundBracket = mso;
 						tokenizedLine = new ArraySegment<Token>(tokenizedLine, j + 1, tokenizedLine.Length - (j + 1)).ToArray();
@@ -186,7 +186,7 @@ public class Parser {
 				else if (t.Str == "{")
 					numBrackets++;
 
-				if (numBrackets == 0) {
+				if (numBrackets == 0) { // TODO: make this less strict. else statement does not have to be on the same line
 					if (parent is OnStatement onStat && tokenizedLine.Length > 1 && tokenizedLine[1] is ElseStatement)
 						onStat.ElseChild = (ElseStatement) Parse(tokenizedLine, 1, lines, ref i, depth + 1);
 
