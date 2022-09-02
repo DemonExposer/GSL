@@ -10,5 +10,6 @@ public class InheritsStatement : UnaryStatement {
 		Symbol = "inherits";
 	}
 
+	// TODO: add an instance of its superclass to the scope and call that "super"
 	public override Object Evaluate(List<TrieDictionary<Object>> vars) => Child is ParenthesesOperator po ? po.Evaluate(vars) : new ArgumentArray(new[] {Child.Evaluate(vars)});
 }
