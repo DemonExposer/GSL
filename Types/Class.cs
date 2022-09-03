@@ -11,7 +11,7 @@ public class Class : Object {
 		TrieDictionary<Object> propertiesCopy = new TrieDictionary<Object>();
 		// TODO: This still copies references of values, which may pose a problem in the future, fix this
 		ClassProperties.GetKeySet().ToList().ForEach(key => propertiesCopy.Insert(key, ClassProperties[key]));
-		return new Instance {ClassType = this, Properties = propertiesCopy};
+		return new Instance {ClassType = this, Properties = propertiesCopy, Parents = parents.Select(elem => elem.Instantiate(args)).ToList()};
 	}
 
 	public override string ToString() => "Class";
