@@ -19,7 +19,7 @@ public class FunctionStatement : BinaryStatement {
 		Args = Left.Children.Cast<VariableToken>().ToList().Select(vt => new FunctionArgument {ArgType = typeof(Object), IsUnlimited = vt.IsUnlimited, Name = vt.Name}).ToArray();
 		body = new FunctionBody((MultilineStatementOperator) Right);
 
-		if (!IsOverride && vars[^1].Contains(Name)) // TODO: store old function so that it can still be called by the new one
+		if (!IsOverride && vars[^1].Contains(Name))
 			throw new InvalidOperationException(Name + " is already defined");
 
 		Object res = new Function(Args, body);

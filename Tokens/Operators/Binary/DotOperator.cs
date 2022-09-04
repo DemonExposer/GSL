@@ -21,7 +21,9 @@ public class DotOperator : BinaryOperator {
 		VariableToken properRight = (VariableToken) Right;
 		if (res is Function f) {
 			Object o = properRight.Args.Evaluate(vars);
+			// Create the object oriented keywords by referencing the instance (which is just the left side of the dot)
 			vars[^1]["this"] = leftObj;
+			vars[^1]["super"] = ((Instance) leftObj).Parents.Count > 0 ? ((Instance) leftObj).Parents[0] : new Null(); // TODO: combine all parents into one
 			return f.Execute(o is ArgumentArray aa ? aa.Arr : new [] {o}, vars);
 		}
 		
