@@ -31,6 +31,8 @@ public class Socket : Class {
 			return null!;
 		};
 		ClassProperties["close"] = new Function(new FunctionArgument[0], close);
+
+		receive = new SocketBody(null!);
 	}
 
 	public override Object Instantiate(params Object[] args) {
