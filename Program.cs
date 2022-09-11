@@ -1,4 +1,5 @@
-﻿using Interpreter.Builtin.Functions;
+﻿using Interpreter.Builtin.Classes;
+using Interpreter.Builtin.Functions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
 using Interpreter.Tokens.Operators.Binary.Arithmetic;
@@ -14,6 +15,7 @@ using Interpreter.Tokens.Statements.Binary;
 using Interpreter.Tokens.Statements.Unary;
 using Interpreter.Types;
 using Array = Interpreter.Types.Array;
+using File = System.IO.File;
 using String = Interpreter.Types.Comparable.String;
 
 namespace Interpreter;
@@ -116,6 +118,7 @@ public class Program {
 		Vars.Insert("args", new Array(new ArraySegment<string>(args, 1, args.Length-1).Select(s => new String(s))));
 		Vars.Insert("null", new Null());
 		Vars.Insert("File", new Builtin.Classes.File());
+		Vars.Insert("Socket", new Socket());
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {

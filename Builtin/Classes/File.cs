@@ -1,6 +1,5 @@
 using Interpreter.Tokens.Operators.N_Ary;
 using Interpreter.Types;
-using Interpreter.Types.Comparable;
 using Interpreter.Types.Function;
 using TrieDictionary;
 using static System.Text.Encoding;
