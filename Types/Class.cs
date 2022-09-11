@@ -8,10 +8,10 @@ public class Class : Object {
 	private List<Class> parents = new List<Class>();
 
 	public virtual Object Instantiate(params Object[] args) {
-		TrieDictionary<Object> propertiesCopy = new TrieDictionary<Object>();
+		Instance instance = new Instance {ClassType = this, Parents = parents.Select(elem => elem.Instantiate(args)).ToList()};
 		// TODO: This still copies references of values, which may pose a problem in the future, fix this
-		ClassProperties.GetKeySet().ToList().ForEach(key => propertiesCopy.Insert(key, ClassProperties[key]));
-		return new Instance {ClassType = this, Properties = propertiesCopy, Parents = parents.Select(elem => elem.Instantiate(args)).ToList()};
+		ClassProperties.GetKeySet().ToList().ForEach(key => instance.Properties.Insert(key, ClassProperties[key]));
+		return instance;
 	}
 
 	public override string ToString() => "Class";

@@ -12,7 +12,7 @@ public class Print : FunctionBody {
 	public override Object Execute(Object[] args, TrieDictionary<Object> vars, List<TrieDictionary<Object>> topScopeVars) {
 		StringBuilder sb = new StringBuilder();
 		foreach (Object o in args)
-			sb.Append(o.ToString()).Append(" ");
+			sb.Append(((Function) o.Properties["toString"]).Execute(new Object[0], topScopeVars).ToString()).Append(" ");
 		
 		Console.WriteLine(sb.ToString().Trim());
 		return null!;
