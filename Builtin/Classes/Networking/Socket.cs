@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Sockets;
 using Interpreter.Tokens.Operators.N_Ary;
-using static System.Text.Encoding;
 using Interpreter.Types;
 using Interpreter.Types.Comparable.Numbers;
 using Interpreter.Types.Function;
 using TrieDictionary;
+using static System.Text.Encoding;
 using Object = Interpreter.Types.Object;
 using String = Interpreter.Types.Comparable.String;
 
-namespace Interpreter.Builtin.Classes; 
+namespace Interpreter.Builtin.Classes.Networking; 
 
 public class Socket : Class {
 	private SocketBody send, receive, close;
@@ -23,7 +23,7 @@ public class Socket : Class {
 			socket.Send(Default.GetBytes(((String) args[0]).Str));
 			return null!;
 		};
-		ClassProperties["send"] = new Function(new[] {new FunctionArgument {ArgType = typeof(String), Name = "data"}}, send);
+		ClassProperties["send"] = new Function(new [] {new FunctionArgument {ArgType = typeof(String), Name = "data"}}, send);
 
 		close = new SocketBody(null!);
 		close.Command = (socket, _) => {
@@ -52,6 +52,12 @@ public class Socket : Class {
 		System.Net.Sockets.Socket socket = new System.Net.Sockets.Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 		socket.Connect(endpoint);
 
+		send.Socket = receive.Socket = close.Socket = socket;
+		
+		return new Instance {ClassType = this, Properties = ClassProperties};
+	}
+
+	public Instance InstantiateWithExistingSocket(System.Net.Sockets.Socket socket) {
 		send.Socket = receive.Socket = close.Socket = socket;
 		
 		return new Instance {ClassType = this, Properties = ClassProperties};

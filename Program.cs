@@ -1,4 +1,5 @@
 ﻿using Interpreter.Builtin.Classes;
+using Interpreter.Builtin.Classes.Networking;
 using Interpreter.Builtin.Functions;
 using Interpreter.Tokens;
 using Interpreter.Tokens.Operators.Binary;
@@ -119,6 +120,7 @@ public class Program {
 		Vars.Insert("null", new Null());
 		Vars.Insert("File", new Builtin.Classes.File());
 		Vars.Insert("Socket", new Socket());
+		Vars.Insert("ServerSocket", new ServerSocket());
 
 		string[] lines = File.ReadAllLines(args[0]);
 		for (int i = 0; i < lines.Length; i++) {
