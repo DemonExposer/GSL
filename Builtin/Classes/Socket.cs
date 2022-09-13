@@ -33,6 +33,12 @@ public class Socket : Class {
 		ClassProperties["close"] = new Function(new FunctionArgument[0], close);
 
 		receive = new SocketBody(null!);
+		receive.Command = (socket, _) => {
+			byte[] buffer = new byte[1024]; // TODO: make this allow for larger data than just 1kB
+			socket.Receive(buffer);
+			return new String(Default.GetString(buffer));
+		};
+		ClassProperties["receive"] = new Function(new FunctionArgument[0], receive);
 	}
 
 	public override Object Instantiate(params Object[] args) {
