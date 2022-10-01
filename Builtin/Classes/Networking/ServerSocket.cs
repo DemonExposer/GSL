@@ -30,7 +30,7 @@ public class ServerSocket : Class {
 
 	public override Object Instantiate(params Object[] args) {
 		if (args.Length != 1)
-			throw new ArgumentException("File constructor takes 1 argument, " + args.Length + " were given");
+			throw new ArgumentException("ServerSocket constructor takes 1 argument, " + args.Length + " were given");
 		
 		IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
 		int port = ((Integer) args[0]).Int;

@@ -43,7 +43,7 @@ public class Socket : Class {
 
 	public override Object Instantiate(params Object[] args) {
 		if (args.Length != 2)
-			throw new ArgumentException("File constructor takes 2 arguments, " + args.Length + " were given");
+			throw new ArgumentException("Socket constructor takes 2 arguments, " + args.Length + " were given");
 		
 		IPAddress ipAddress = IPAddress.Parse(((String) args[0]).Str);
 		int port = ((Integer) args[1]).Int;
