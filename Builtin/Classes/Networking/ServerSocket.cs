@@ -32,7 +32,7 @@ public class ServerSocket : Class {
 		if (args.Length != 1)
 			throw new ArgumentException("ServerSocket constructor takes 1 argument, " + args.Length + " were given");
 		
-		IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+		IPAddress ipAddress = IPAddress.Parse("0.0.0.0");
 		int port = ((Integer) args[0]).Int;
 		
 		IPEndPoint endpoint = new IPEndPoint(ipAddress, port);
